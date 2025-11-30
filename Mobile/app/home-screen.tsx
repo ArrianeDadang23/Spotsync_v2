@@ -11,7 +11,7 @@ import {
   Dimensions,
   SafeAreaView,
   Animated,
-  BackHandler, // Import BackHandler
+  BackHandler,
   Alert 
 } from 'react-native';
 import { useAuth } from '../context/AuthContext';
@@ -111,7 +111,6 @@ export default function HomeScreen() {
   const [isPanelVisible, setIsPanelVisible] = useState(false);
   const [alert, setAlert] = useState({ message: '', type: 'success', visible: false });
 
-  // --- FIX: Correct Way to Remove Listener ---
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
@@ -122,14 +121,11 @@ export default function HomeScreen() {
         return true; 
       };
 
-      // 1. Store the subscription
       const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
 
-      // 2. Use subscription.remove()
       return () => subscription.remove();
     }, [])
   );
-  // -------------------------------------------
 
   useEffect(() => {
     if (!currentUser) return;

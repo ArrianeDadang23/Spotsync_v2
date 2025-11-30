@@ -26,13 +26,10 @@ import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/dat
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 
-// Custom component imports
 import BlankHeader from '../components/BlankHeader';
 import BottomNavBar from '../components/BottomNavBar';
 
-// Define placeholder color
 const PLACEHOLDER_COLOR = "#A9A9A9";
-// NEW CONSTANTS for Moderation
 const CHECKING_TEXT = "Checking your image if it contains inappropriate content...";
 const CHECKING_SHORT = "Scanning...";
 const INAPPROPRIATE_ALERT_TITLE = "Inappropriate Content Detected";
@@ -40,7 +37,6 @@ const INAPPROPRIATE_ALERT_MESSAGE = (flaggedCount: number) =>
   `${flaggedCount} image(s) were flagged for potentially inappropriate content (e.g., nudity, violence, self-harm, hate speech) and were not added. Please upload appropriate images.`;
 
 
-// --- Type Definitions ---
 interface UserData {
   profileURL?: string;
   coverURL?: string;
@@ -57,9 +53,7 @@ interface UserData {
   [key: string]: any;
 }
 
-// --- Constants ---
 const WORD_LIMIT = 150;
-// CRITICAL: Max image limit
 const MAX_IMAGES = 1;
 
 const LOCATIONS = [
@@ -83,23 +77,19 @@ const CATEGORIES = [
   "Health & Personal Care", "Toys & Games", "Food & Beverages", "Automotive Items",
   "Musical Instruments", "Pet Items", "Others",
 ];
-// Define your backend URL
 const YOUR_BACKEND_URL = "https://server.spotsync.site";
 
 
-// --- Main Screen Component ---
 function ReportFoundItemScreen() {
   const API = YOUR_BACKEND_URL;
   const { currentUser } = useAuth();
   const router = useRouter();
   const auth = getAuth();
 
-  // Form State
   const [itemName, setItemName] = useState('');
   const [dateFound, setDateFound] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [locationFound, setLocationFound] = useState('');
-  // 1. New State for Custom Location
   const [customLocation, setCustomLocation] = useState('');
 
   const [category, setCategory] = useState('');
@@ -319,7 +309,6 @@ const processImages = async (assets: ImagePicker.ImagePickerAsset[]) => {
 const handleSubmit = async () => {
   if (!currentUser || !userData) return Alert.alert('Error', 'User data not loaded.');
   
-  // 2. Determine final location value
   const finalLocation = locationFound === 'Others' ? customLocation.trim() : locationFound;
 
   if (!itemName || !dateFound || !finalLocation || !category || !itemDescription || !howItemFound) {
@@ -350,7 +339,7 @@ const handleSubmit = async () => {
       images: imageURLs,
       itemName,
       dateFound,
-      locationFound: finalLocation, // 3. Use finalLocation
+      locationFound: finalLocation, 
       archivedStatus: false,
       finder: `${userData.firstName || ''} ${userData.lastName || ''}`,
       claimStatus: 'unclaimed',
@@ -405,7 +394,7 @@ const handleSubmit = async () => {
       dateSubmitted: new Date().toISOString(),
       itemDescription,
       type: "Found",
-      locationFound: finalLocation, // 3. Use finalLocation
+      locationFound: finalLocation,
       category,
       status: "Pending",
       highestMatchingRate: top4Matches?.[0]?.scores?.overallScore ?? 0,
@@ -608,7 +597,6 @@ const handleSubmit = async () => {
               <Text style={[styles.pickerButtonText, !locationFound && styles.placeholderText]} numberOfLines={1}>{locationFound || "Select Location"}</Text>
             </TouchableOpacity>
 
-            {/* 4. Display input for 'Others' */}
             {locationFound === 'Others' && (
                 <View style={{ marginTop: -10, marginBottom: 20 }}>
                     <Text style={styles.label}>Specify Location</Text>

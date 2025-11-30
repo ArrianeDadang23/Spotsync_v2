@@ -272,7 +272,6 @@ function ItemManagementScreen() {
         />
       )}
 
-      {/* Modals */}
       <Modal visible={showYearModal} transparent={true} animationType="fade">
         <TouchableOpacity style={styles.modalOverlay} onPress={() => setShowYearModal(false)}>
           <View style={styles.modalContent}>

@@ -15,16 +15,15 @@ import { useAuth } from "../context/AuthContext";
 import { useRouter, Link } from "expo-router";
 import { doc, getDoc } from "firebase/firestore";
 import { db, auth } from "../firebase";
-import { sendPasswordResetEmail, User } from "firebase/auth"; // Import User type
+import { sendPasswordResetEmail, User } from "firebase/auth"; 
 import { Ionicons } from "@expo/vector-icons";
 
-// 1. IMPORTS FOR 2FA
 import { useOfflineNotifier } from "../hooks/useOfflineNotifier"; 
-import VerificationModal from "../components/VerificationModal"; // Ensure correct path
-import createVerificationCode from "../utils/createVerificationCode"; // Ensure correct path
+import VerificationModal from "../components/VerificationModal"; 
+import createVerificationCode from "../utils/createVerificationCode"; 
 
 const PLACEHOLDER_COLOR = "#A9A9A9";
-const API = "https://server.spotsync.site"; // Ensure this matches your other files
+const API = "https://server.spotsync.site"; 
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -35,14 +34,12 @@ export default function LoginScreen() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // --- Forgot Password States ---
   const [showForgotModal, setShowForgotModal] = useState(false);
   const [forgotId, setForgotId] = useState('');
   const [resetting, setResetting] = useState(false);
   const [resetMessage, setResetMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  // --- 2FA Verification States ---
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [pendingUser, setPendingUser] = useState<User | null>(null);
   const [initialVerificationCode, setInitialVerificationCode] = useState(null);
@@ -52,7 +49,6 @@ export default function LoginScreen() {
     setFormData((prevState) => ({ ...prevState, [name]: value }));
   };
 
-  // --- Helper: Send Email ---
   const sendVerificationEmail = async (user: User, code: string) => {
       try {
           await fetch(`${API}/api/send-email`, {
@@ -76,9 +72,7 @@ export default function LoginScreen() {
       }
   };
 
-  // --- Helper: Complete Login Navigation ---
   const finalizeLogin = async (uid: string) => {
-      // Re-fetch strictly to determine role
       const userDocRef = doc(db, 'users', uid);
       const userDocSnap = await getDoc(userDocRef);
       
@@ -105,33 +99,27 @@ export default function LoginScreen() {
       setError("");
       setLoading(true);
 
-      // 1. Perform Basic Auth Login
       const userCredential = await login(formData.studentId, formData.password);
       const user = userCredential.user;
       
-      // 2. Fetch User Data to Check 2FA Status
       const userDocRef = doc(db, 'users', user.uid);
       const userDocSnap = await getDoc(userDocRef);
 
       if (userDocSnap.exists()) {
         const userData = userDocSnap.data();
         
-        // --- 2FA CHECK ---
         if (userData.is2FAEnabled) {
-             // A. 2FA is ON: Generate Code & Show Modal
-             // Important: Pass email FIRST, then UID (Correct Order)
              if (user.email) {
                  const code = await createVerificationCode(user.email, user.uid);
                  await sendVerificationEmail(user, code);
                  
-                 setPendingUser(user); // Save user to state
+                 setPendingUser(user); 
                  setInitialVerificationCode(code);
-                 setShowVerificationModal(true); // Open Modal
+                 setShowVerificationModal(true); 
              } else {
                  setError("User email not found for 2FA.");
              }
         } else {
-             // B. 2FA is OFF: Proceed as normal
              await finalizeLogin(user.uid);
         }
 
@@ -141,7 +129,6 @@ export default function LoginScreen() {
     } catch (error: any) {
       console.error("Login error:", error.code, error.message);
 
-      // Error Handling (Keep your existing logic)
       if (error.code === 'auth/network-request-failed' || error.code === 'unavailable') {
         notifyOffline(handleSubmit); 
       } 
@@ -161,13 +148,10 @@ export default function LoginScreen() {
         setError("Login failed. Please check your credentials.");
       }
     } finally {
-      // Only stop loading if we are NOT showing the modal
-      // If modal opens, we want the screen to stay "busy" or just wait
       setLoading(false);
     }
   };
 
-  // --- Function for "Forgot Password" (Keep existing) ---
   async function handlePasswordReset() {
     if (!forgotId) return;
     setResetting(true);
@@ -182,7 +166,6 @@ export default function LoginScreen() {
       await sendPasswordResetEmail(auth, matchedEmail);
       setResetMessage(`Password reset link sent to ${matchedEmail}`);
     } catch (err: any) {
-      // ... (Keep existing error handling)
       if (err.message === 'No account found with that Student ID.') {
         setResetMessage('No account found with that Student ID.');
       } else {
@@ -195,20 +178,16 @@ export default function LoginScreen() {
 
   return (
     <>
-      {/* 2FA Verification Modal */}
       <VerificationModal
         show={showVerificationModal}
         onClose={() => {
             setShowVerificationModal(false);
             setPendingUser(null);
-            // Optionally sign out if they cancel 2FA? 
-            // auth.signOut(); 
         }}
-        user={pendingUser} // Pass the user we just logged in
+        user={pendingUser} 
         sendVerificationEmail={sendVerificationEmail}
         initialCode={initialVerificationCode}
         onVerified={async () => {
-            // Once 2FA is verified, finish the login
             if (pendingUser) {
                 setShowVerificationModal(false);
                 await finalizeLogin(pendingUser.uid);
@@ -216,7 +195,6 @@ export default function LoginScreen() {
         }}
       />
 
-      {/* Forgot Password Modal (Keep existing) */}
       <Modal
         visible={showForgotModal}
         transparent={true}
@@ -274,7 +252,6 @@ export default function LoginScreen() {
         </View>
       </Modal>
 
-      {/* Main Screen (Keep existing) */}
       <View style={styles.mainContainer}>
         <View style={styles.circle}>
           <Image source={require('../assets/images/spotsync-logo-white.png')} style={styles.logo} />
@@ -340,7 +317,6 @@ export default function LoginScreen() {
   );
 }
 
-// ... (Styles remain exactly the same) ...
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
@@ -447,7 +423,6 @@ const styles = StyleSheet.create({
     width: '100%',
     textAlign: 'center',
   },
-  // Modal Styles
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.6)',

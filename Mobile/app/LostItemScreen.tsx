@@ -12,7 +12,7 @@ import {
   Image,
   SafeAreaView,
   BackHandler,
-  ScrollView, // Added ScrollView
+  ScrollView, 
 } from 'react-native';
 import { useAuth } from '../context/AuthContext'; 
 import { useRouter, useFocusEffect } from 'expo-router'; 
@@ -194,7 +194,6 @@ export default function LostItemsScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Search and Filter */}
       <View style={styles.filterContainer}>
         <TextInput
           style={styles.searchInput}
@@ -208,7 +207,6 @@ export default function LostItemsScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Items List */}
       {loading ? (
         <ActivityIndicator size="large" color="#007BFF" style={{ flex: 1 }} />
       ) : (
@@ -228,7 +226,6 @@ export default function LostItemsScreen() {
         />
       )}
       
-      {/* Saved Items Modal */}
       <Modal visible={showSavedModal} transparent={true} animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
@@ -290,7 +287,6 @@ export default function LostItemsScreen() {
         </View>
       </Modal>
 
-       {/* Category Picker Modal - SCROLLABLE FIX */}
       <Modal visible={showCategoryModal} transparent={true} animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>

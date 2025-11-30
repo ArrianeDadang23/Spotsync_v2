@@ -88,7 +88,6 @@ const UserNotificationScreen: React.FC = () => {
     { title: string; data: NotificationItem[] }[]
   >([]);
 
-  // --- FIX: Correct Way to Remove Listener ---
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
@@ -99,7 +98,6 @@ const UserNotificationScreen: React.FC = () => {
       return () => subscription.remove(); 
     }, [router])
   );
-  // -------------------------------------------
 
   const [loading, setLoading] = useState(true);
   const [alert, setAlert] = useState<{ message: string; type: string } | null>(

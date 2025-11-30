@@ -8,21 +8,17 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from 'react-native';
-import { useAuth } from '../context/AuthContext'; // Adjust path
+import { useAuth } from '../context/AuthContext'; 
 import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../firebase'; // Adjust path
+import { db } from '../firebase'; 
 import { getAuth } from 'firebase/auth';
 import { useRouter } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import BlankHeader from '../components/BlankHeader'; // Adjust path
-import BottomNavBar from '../components/BottomNavBar'; // Adjust path
 
-// --- Type Definitions ---
 interface UserData {
   firstName?: string;
   lastName?: string;
   profileURL?: string;
-  // Add other fields as needed
   [key: string]: any;
 }
 
@@ -60,8 +56,6 @@ function UserFoundProcedureScreen() {
   }, [currentUser]);
 
   const handleGotIt = () => {
-    // Navigate to the next screen for reporting a found item
-    // Adjust the path according to your Expo Router setup
     router.push(`/ReportFoundItemScreen`);
   };
 
@@ -80,7 +74,7 @@ function UserFoundProcedureScreen() {
           <Text style={styles.mainTitle}>Item Found Procedures</Text>
 
           <MaterialCommunityIcons
-            name="exclamation-thick" // Using a similar icon
+            name="exclamation-thick" 
             size={70}
             color="orange"
             style={styles.icon}
@@ -122,7 +116,7 @@ function UserFoundProcedureScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#D9D9D9', // Light gray background
+    backgroundColor: '#D9D9D9', 
   },
   loadingContainer: {
     flex: 1,
@@ -131,12 +125,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#D9D9D9',
   },
   scrollContent: {
-    paddingBottom: 80, // Ensure space above BottomNavBar
+    paddingBottom: 80, 
   },
   contentContainer: {
     margin: 20,
     padding: 20,
-    backgroundColor: '#FFFFFF', // White container background
+    backgroundColor: '#FFFFFF', 
     borderRadius: 15,
     alignItems: 'center',
     shadowColor: "#000",
@@ -157,7 +151,7 @@ const styles = StyleSheet.create({
   remindersBox: {
     width: '100%',
     padding: 15,
-    backgroundColor: '#FFF3CD', // Light yellow for reminders
+    backgroundColor: '#FFF3CD', 
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#FFEEBA',
@@ -165,24 +159,24 @@ const styles = StyleSheet.create({
   },
   remindersText: {
     fontSize: 16,
-    color: '#856404', // Darker yellow text
+    color: '#856404', 
     lineHeight: 22,
   },
   stepsTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 15,
-    alignSelf: 'flex-start', // Align title to the left
+    alignSelf: 'flex-start',
   },
   stepText: {
     fontSize: 16,
     lineHeight: 24,
     marginBottom: 15,
-    textAlign: 'left', // Ensure text is left-aligned
-    width: '100%', // Take full width for alignment
+    textAlign: 'left', 
+    width: '100%', 
   },
   gotItButton: {
-    backgroundColor: '#007AFF', // Blue button
+    backgroundColor: '#007AFF', 
     paddingVertical: 12,
     paddingHorizontal: 40,
     borderRadius: 25,
@@ -190,7 +184,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   gotItButtonText: {
-    color: '#FFFFFF', // White text
+    color: '#FFFFFF', 
     fontSize: 18,
     fontWeight: 'bold',
   },

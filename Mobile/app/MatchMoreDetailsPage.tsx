@@ -6,11 +6,9 @@ import { useAuth } from '../context/AuthContext';
 import { db } from '../firebase';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-// Assuming these are your custom navigation components
 import BlankHeader from '../components/BlankHeader';
 import BottomNavBar from '../components/BottomNavBar';
 
-// --- Type Definitions ---
 interface MatchItemDetails {
   itemId: string;
   itemName: string;
@@ -43,7 +41,6 @@ interface Item {
   topMatches?: Match[];
 }
 
-// --- Reusable Components ---
 const ReportedItemCard = ({ item }: { item: Item }) => {
   const getStatusStyle = (status: string) => {
     switch (status?.toLowerCase()) {
@@ -83,7 +80,6 @@ const ReportedItemCard = ({ item }: { item: Item }) => {
   );
 };
 
-// ✨ FIX: Updated MatchCard to include progress bars
 const MatchCard = ({ match, index, itemType }: { match: Match; index: number; itemType: string }) => {
   const matchItem = itemType === 'found' ? match.lostItem : match.foundItem;
   if (!matchItem) return null;
@@ -125,7 +121,6 @@ const MatchCard = ({ match, index, itemType }: { match: Match; index: number; it
   );
 };
 
-// --- Main Screen Component ---
 function MatchMoreDetailsPage() {
   const params = useLocalSearchParams();
   const router = useRouter();
@@ -258,7 +253,6 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     opacity: 0.7,
   },
-  // ✨ FIX: New styles for the progress bars
   scoreRow: {
     marginBottom: 8,
   },
@@ -270,7 +264,7 @@ const styles = StyleSheet.create({
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: '#28a745', // Green color
+    backgroundColor: '#28a745', 
     borderRadius: 4,
   },
 });

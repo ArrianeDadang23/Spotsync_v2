@@ -52,7 +52,6 @@ interface ItemManagementData {
   [key: string]: any;
 }
 
-// --- Reusable Components ---
 const MatchCard = ({ match, index, itemType }: { match: Match; index: number; itemType: string }) => {
   const matchItem = match.foundItem;
   if (!matchItem) return null; 
@@ -121,7 +120,6 @@ function LostMatchResults() {
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [isSubmittingRating, setIsSubmittingRating] = useState(false);
 
-  // 1. ADD STATE FOR TOGGLING
   const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
@@ -172,7 +170,6 @@ function LostMatchResults() {
     );
   }
 
-  // 2. LOGIC FOR SLICING MATCHES
   const allMatches = itemData.topMatches || [];
   const displayedMatches = showAll ? allMatches : allMatches.slice(0, 4);
 
@@ -283,7 +280,6 @@ const styles = StyleSheet.create({
       textAlign: 'center',
       paddingVertical: 20,
   },
-  // New Styles for See All Button
   seeAllButton: {
       paddingVertical: 12,
       paddingHorizontal: 20,

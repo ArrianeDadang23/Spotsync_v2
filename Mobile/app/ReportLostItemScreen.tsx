@@ -48,7 +48,6 @@ interface UserData {
   [key: string]: any;
 }
 
-// --- Constants ---
 const WORD_LIMIT = 150;
 const MAX_IMAGES = 1;
 
@@ -85,7 +84,6 @@ function ReportLostItemScreen() {
   const [dateLost, setDateLost] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [locationLost, setLocationLost] = useState('');
-  // 1. New State for Custom Location
   const [customLocation, setCustomLocation] = useState('');
   
   const [category, setCategory] = useState('');
@@ -279,7 +277,6 @@ function ReportLostItemScreen() {
   const handleSubmit = async () => {
     if (!currentUser || !userData) return Alert.alert('Error', 'User data not loaded.');
     
-    // 2. Determine final location value
     const finalLocation = locationLost === 'Others' ? customLocation.trim() : locationLost;
 
     if (!itemName || !dateLost || !finalLocation || !category || !itemDescription || !howItemLost) return Alert.alert('Error', 'Please fill all required fields.');
@@ -308,7 +305,7 @@ function ReportLostItemScreen() {
       const lostItemData = {
         itemId: customItemId, uid: currentUser.uid, images: imageURLs,
         itemName, dateLost, 
-        locationLost: finalLocation, // 3. Use finalLocation here
+        locationLost: finalLocation,
         archivedStatus: false, founder: 'Unknown',
         owner: `${userData.firstName || ''} ${userData.lastName || ''}`,
         claimStatus: 'unclaimed', category, itemDescription, howItemLost,
@@ -350,7 +347,7 @@ function ReportLostItemScreen() {
         archivedStatus: false, itemName,
         dateSubmitted: new Date().toISOString(),
         itemDescription, type: "Lost",
-        locationLost: finalLocation, // 3. Use finalLocation here
+        locationLost: finalLocation, 
         category, status: "Posted",
         highestMatchingRate: top4Matches?.[0]?.scores?.overallScore ?? 0,
         topMatches: top4Matches, personalInfo: userData,
@@ -597,7 +594,6 @@ function ReportLostItemScreen() {
               <Text style={[styles.pickerButtonText, !locationLost && styles.placeholderText]} numberOfLines={1}>{locationLost || "Select Location"}</Text>
             </TouchableOpacity>
 
-            {/* 4. Display input for 'Others' */}
             {locationLost === 'Others' && (
                 <View style={{ marginTop: -10, marginBottom: 20 }}>
                     <Text style={styles.label}>Specify Location</Text>
@@ -785,7 +781,7 @@ const styles = StyleSheet.create({
     marginBottom: 6, 
     fontWeight: '600' 
   },
-  inputField: { // Unified style for standard text inputs
+  inputField: { 
     backgroundColor: '#f9f9f9', 
     paddingHorizontal: 15, 
     paddingVertical: 14, 
@@ -801,7 +797,7 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top', 
     marginBottom: 5 
   },
-  pickerButton: { // Unified style for pickers (Date, Location, Category)
+  pickerButton: { 
     backgroundColor: '#f9f9f9', 
     padding: 15, 
     borderRadius: 8, 
@@ -824,10 +820,9 @@ const styles = StyleSheet.create({
     marginBottom: 15 
   },
 
-// --- Image Picker Styles ---
   imagePreviewContainer: { 
     marginBottom: 20, 
-    height: 130, // Increased height
+    height: 130, 
     paddingBottom: 10,
   },
   addImageButton: { 
@@ -871,7 +866,6 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
 
-// --- Submit/Status Styles ---
   submitButton: { 
     backgroundColor: '#143447', 
     padding: 18, 
@@ -904,7 +898,6 @@ const styles = StyleSheet.create({
   },
 
 
-// --- Modal/Other styles (Mostly unchanged but included for completeness) ---
   loadingOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center' },
   loadingText: { color: 'white', marginTop: 10, fontSize: 16, fontWeight: 'bold', textAlign: 'center', paddingHorizontal: 20 },
   container: { flex: 1, backgroundColor: '#f0f2f5', paddingTop: 50 },

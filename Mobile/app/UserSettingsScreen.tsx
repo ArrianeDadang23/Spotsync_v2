@@ -16,13 +16,13 @@ import {
 } from 'react-native';
 import { useAuth } from '../context/AuthContext'; 
 import { useRouter, useFocusEffect } from 'expo-router'; 
-import { doc, getDoc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore'; // Added imports
+import { doc, getDoc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore'; 
 import { db } from '../firebase'; 
 import { getAuth, reauthenticateWithCredential, EmailAuthProvider, updatePassword, User } from "firebase/auth";
 import * as ImagePicker from 'expo-image-picker';
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
-import * as Print from 'expo-print'; // NEW IMPORT
-import * as Sharing from 'expo-sharing'; // NEW IMPORT
+import * as Print from 'expo-print'; 
+import * as Sharing from 'expo-sharing'; 
 
 import VerificationModal from '../components/VerificationModal';
 import createVerificationCode from '../utils/createVerificationCode';
@@ -58,7 +58,6 @@ function UserSettingsScreen() {
     }, [router])
   );
   
-  // --- Profile States ---
   const [profileImage, setProfileImage] = useState<ImagePicker.ImagePickerAsset | null>(null);
   const [coverImage, setCoverImage] = useState<ImagePicker.ImagePickerAsset | null>(null);
   const [profileURL, setProfileURL] = useState('');
@@ -75,33 +74,91 @@ function UserSettingsScreen() {
   const [address, setAddress] = useState('');
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
-  const [exporting, setExporting] = useState(false); // NEW STATE for export loading
-
-  // --- 2FA State ---
+  const [exporting, setExporting] = useState(false); 
   const [is2FAEnabled, setIs2FAEnabled] = useState(false);
-
-  // --- Modal States ---
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
   const [showCourseModal, setShowCourseModal] = useState(false);
   const [showGenderModal, setShowGenderModal] = useState(false);
-  
-  // --- Password Logic States ---
   const [password, setPassword] = useState('');
   const [checkingPassword, setCheckingPassword] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [changingPassword, setChangingPassword] = useState(false);
-
-  // --- Verification Logic States ---
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [pendingPassword, setPendingPassword] = useState<string | null>(null);
   const [verificationPurpose, setVerificationPurpose] = useState<'PASSWORD_CHANGE' | '2FA_TOGGLE' | null>(null);
 
   const courseList: Course[] = [
     { abbr: "BSAM", name: "Bachelor of Science in Applied Mathematics" },
-    { abbr: "BSAP", name: "Bachelor of Science in Applied Physics" },
-    // ... (rest of your courses)
+  { abbr: "BSAP", name: "Bachelor of Science in Applied Physics" },
+  { abbr: "BSChem", name: "Bachelor of Science in Chemistry" },
+  { abbr: "BSES", name: "Bachelor of Science in Environmental Science " },
+  { abbr: "BSFT", name: "Bachelor of Science in Food Technology" },
+
+  { abbr: "BSAuT", name: "Bachelor of Science in Autotronics" },
+  { abbr: "BSAT", name: "Bachelor of Science in Automotive Technology" },
+  { abbr: "BSEMT", name: "Bachelor of Science in Electro-Mechanical Technology" },
+  { abbr: "BSET", name: "Bachelor of Science in Electronics Technology" },
+  { abbr: "BSESM", name: "Bachelor of Science in Energy Systems and Management" },
+  { abbr: "BSMET", name: "Bachelor of Science in Manufacturing Engineering Technology" },
+  { abbr: "BTOM", name: "Bachelor of Technology, Operation, and Management" },
+  { abbr: "BS MathEd", name: "Bachelor of Secondary Education Major in Mathematics" },
+  { abbr: "BS SciEd", name: "Bachelor of Secondary Education Major in Science" },
+  { abbr: "BTLED", name: "Bachelor of Technology and Livelihood Education" },
+  { abbr: "BTVTed", name: "Bachelor of Technical-Vocational Teacher Education" },
+  
+  { abbr: "BTTE", name: "Bachelor of Technician Teacher Education" },
+
+  { abbr: "STEM", name: "Senior High School - Science, Technology, Engineering and Mathematics" },
+  
+
+  { abbr: "BSArch", name: "Bachelor of Science in Architecture" },
+  { abbr: "BSCE", name: "Bachelor of Science in Civil Engineering" },
+  { abbr: "BSCPE", name: "Bachelor of Science in Computer Engineering" },
+  { abbr: "BSEE", name: "Bachelor of Science in Electrical Engineering" },
+  { abbr: "BSECE", name: "Bachelor of Science in Electronic Engineering" },
+  { abbr: "BSGE", name: "Bachelor of Science in Geodetic Engineering" },
+  { abbr: "BSME", name: "Bachelor of Science in Mechanical Engineering" },
+
+  { abbr: "BSDS", name: "Bachelor of Science in Data Science" },
+  { abbr: "BSIT", name: "Bachelor of Science in Information Technology" },
+  { abbr: "BSTCM", name: "Bachelor of Science in Technology Communication Management" },
+  { abbr: "BSCS", name: "Bachelor of Science in Computer Science" },
+
+  { abbr: "COM", name: "College of Medicine (Night Class)" },
+
+  { abbr: "MSAMS", name: "Master of Science in Applied Mathematics Sciences" },
+  { abbr: "MSETS", name: "Master of Science in Environmental Science and Technology" },
+
+  { abbr: "MITO", name: "Master in Industrial Technology and Operations" },
+
+  { abbr: "DTE", name: "Doctor in Technology Education" },
+  { abbr: "PhD MathEdSci", name: "Doctor of Philosophy in Mathematics Sciences " },
+  { abbr: "PhD MathEd", name: "Doctor of Philosophy in Mathematics Education" },
+  { abbr: "PhD SciEd Chem", name: "Doctor of Philosophy in Science Education Major in Chemistry" },
+  { abbr: "PhD EPM", name: "Doctor of Philosophy in Educational Planning and Management" },
+  { abbr: "MEPM", name: "Master in Education Planning and Management" },
+  { abbr: "MATESL", name: "Master of Arts in Teaching English as Second Language" },
+  { abbr: "MATSpEd", name: "Master of Arts in Teaching Special Education" },
+  { abbr: "MSMathEd", name: "Master of Science in Mathematics Education" },
+  { abbr: "MSEd Physics", name: "Master of Science Education Major in Physics" },
+  { abbr: "MSTMath", name: "Master of Science in Teaching Mathematics" },
+  { abbr: "MPA", name: "Master in Public Administration" },
+  { abbr: "MTTE", name: "Master in Technician Teacher Education" },
+  { abbr: "MTTEd", name: "Master of Technical and Technology Education" },
+
+  { abbr: "MEng", name: "Master of Engineering Program" },
+  { abbr: "MSEE", name: "Master of Science in Electrical Engineering" },
+  { abbr: "MSSDPS", name: "Master of Science in Sustainable Development Professional Science" },
+  { abbr: "MPSEM", name: "Master in Power System Engineering and Management" },
+
+  { abbr: "MSTCM", name: "Master of Science in Technology Communication Management" },
+  { abbr: "MIT", name: "Master in Information Technology" },
+
+  { abbr: "MPS-DSPE", name: "Master in Public Sector Major in Digital Service Platforms and E-Governance" },
+  { abbr: "MPS-SD", name: "Master in Public Sector Innovation Major in Sustainable Development" },
+  { abbr: "MPS-PPS", name: "Master in Public Sector Innovation Major in Public Policy Studies" },
   ];
 
   const initials = `${firstName?.[0] || ''}${lastName?.[0] || ''}`.toUpperCase();
@@ -138,7 +195,6 @@ function UserSettingsScreen() {
     fetchUserData();
   }, [currentUser]);
 
-  // ... (handleFileSelect, uploadImage, handleUpdate, handleConfirmPassword, sendVerificationEmail, handleChangePassword, handleToggle2FA remain the same)
   const handleFileSelect = async (field: 'profile' | 'cover') => {
       const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (permissionResult.granted === false) {
@@ -450,7 +506,6 @@ function UserSettingsScreen() {
         </html>
         `;
 
-        // 5. Generate PDF and Share
         const { uri } = await Print.printToFileAsync({ html });
         await Sharing.shareAsync(uri, { UTI: '.pdf', mimeType: 'application/pdf' });
 
@@ -571,7 +626,6 @@ function UserSettingsScreen() {
               <Text style={styles.subSectionTitle}>Database Management</Text>
               
 
-              {/* --- DATA EXPORT BUTTON --- */}
               <TouchableOpacity 
                 style={styles.settingsRow} 
                 onPress={handleDataExport}
@@ -589,7 +643,6 @@ function UserSettingsScreen() {
         </ScrollView>
       )}
 
-       {/* ... (Keep All Modals) ... */}
        <Modal visible={showGenderModal} transparent={true} animationType="slide">
          <TouchableOpacity style={styles.modalContainer} activeOpacity={1} onPressOut={() => setShowGenderModal(false)}>
             <View style={styles.modalContent}>
@@ -702,7 +755,6 @@ function UserSettingsScreen() {
 }
 
 const styles = StyleSheet.create({
-    // ... (Keep existing styles) ...
     container: { flex: 1, backgroundColor: '#f0f2f5', paddingBottom: 100 },
     loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
     imageSection: { marginBottom: 60, },

@@ -18,7 +18,6 @@ import { useRouter } from 'expo-router';
 import BlankHeader from '../components/BlankHeader';
 import BottomNavBar from '../components/BottomNavBar';
 
-// --- Type Definitions ---
 interface UserData {
   profileURL?: string;
   coverURL?: string;
@@ -37,7 +36,6 @@ interface UserData {
     name: string;
   };
   section?: string;
-  // Add any other fields you expect from Firestore
   [key: string]: any; 
 }
 
@@ -73,7 +71,6 @@ function UserProfileScreen() {
   }, [currentUser]);
 
   const handleEdit = () => {
-    // Navigate to the settings screen
     router.push('/UserSettingsScreen'); 
   };
 
@@ -199,7 +196,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ccc',
   },
   profilePictureContainer: {
-    marginTop: -75, // Half of the profile picture height
+    marginTop: -75, 
     borderWidth: 5,
     borderColor: 'white',
     borderRadius: 75,
@@ -285,7 +282,7 @@ const styles = StyleSheet.create({
   detailValue: {
     fontSize: 16,
     color: '#333',
-    flexShrink: 1, // Allow text to wrap
+    flexShrink: 1, 
     textAlign: 'right',
   },
 });
