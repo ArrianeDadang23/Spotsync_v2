@@ -1,0 +1,375 @@
+import React, { useRef, useState, useEffect } from "react"; 
+import "./styles/CreateAccount.css";
+import { Form, Card, Alert, Spinner } from "react-bootstrap"; 
+import { useAuth } from "../context/AuthContext.jsx";
+import { useNavigate } from "react-router-dom";
+import { signInAnonymously } from "firebase/auth";
+import { auth, db } from "../firebase"; 
+import { doc, getDoc } from "firebase/firestore"; 
+import createVerificationCode from "../components/createVerificationCode.jsx";
+import VerificationModal from "../components/VerificationModal";
+import 'bootstrap-icons/font/bootstrap-icons.css'; 
+
+function CreateAccount() {
+  const navigate = useNavigate();
+  const API = "https://server.spotsync.site";
+  const { signup, login } = useAuth();
+  const handleLogin = () => { navigate("/log-in"); };
+  const [guestLoading, setGuestLoading] = useState(false); 
+  const firstNameRef = useRef();
+  const lastNameRef = useRef();
+  const studentIdRef = useRef();
+  const contactNumberRef = useRef();
+  const emailRef = useRef();
+  const passwordRef = useRef();
+  const passwordConfirmRef = useRef();
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showVerifyModal, setShowVerifyModal] = useState(false);
+  const [pendingUserData, setPendingUserData] = useState(null);
+  const [capsLock, setCapsLock] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [passwordValue, setPasswordValue] = useState("");
+  const [confirmPasswordValue, setConfirmPasswordValue] = useState("");
+  const [passwordsMatch, setPasswordsMatch] = useState(false);
+
+  useEffect(() => {
+    setPasswordsMatch(passwordValue === confirmPasswordValue && passwordValue !== "");
+    if (passwordValue !== confirmPasswordValue && confirmPasswordValue !== "") {
+       setError("Passwords do not match"); 
+    } else if (error === "Passwords do not match") {
+       setError(""); 
+    }
+  }, [passwordValue, confirmPasswordValue, error]);
+
+
+  async function sendVerificationEmail(userData, code) {
+      await fetch(`${API}/api/send-email`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: userData.email,
+          subject: "Verify your Spotsync Account",
+          html: `
+            <h2>Email Verification</h2>
+            <p>Your verification code is:</p>
+            <h1 style="letter-spacing: 5px;">${code}</h1>
+            <p>This code will expire in 2 minutes.</p>
+          `,
+        }),
+      });
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    if (passwordValue !== confirmPasswordValue) {
+      return setError("Passwords do not match");
+    }
+    if (passwordValue.length < 6) {
+        return setError("Password should be at least 6 characters");
+    }
+
+    try {
+      setError("");
+      setLoading(true);
+
+      const userData = {
+        email: emailRef.current.value,
+        password: passwordValue, 
+        firstName: firstNameRef.current.value,
+        lastName: lastNameRef.current.value,
+        contactNumber: contactNumberRef.current.value,
+        studentId: studentIdRef.current.value,
+      };
+
+      const code = await createVerificationCode({ uid: userData.email, email: userData.email });
+      await sendVerificationEmail(userData, code);
+      setPendingUserData(userData);
+      setShowVerifyModal(true);
+    } catch (err) {
+      setError(err.message);
+    }
+
+    setLoading(false);
+  }
+
+  async function finalizeSignup() {
+    try {
+      await signup(
+        pendingUserData.email,
+        pendingUserData.password,
+        pendingUserData.firstName,
+        pendingUserData.lastName,
+        pendingUserData.contactNumber,
+        pendingUserData.studentId
+      );
+      
+      const userCredential = await login(
+        pendingUserData.studentId, 
+        pendingUserData.password
+      );
+      
+      const user = userCredential.user;
+      
+      const userDocSnap = await getDoc(doc(db, 'users', user.uid));
+      
+      if (userDocSnap.exists()) {
+          const userData = userDocSnap.data();
+          const role = userData.role;
+
+          localStorage.setItem('role', userData.role || 'user'); 
+          localStorage.setItem('firstName', userData.firstName || '');
+          localStorage.setItem('lastName', userData.lastName || '');
+          localStorage.setItem('uid', user.uid); 
+          localStorage.setItem('email', userData.email || ''); 
+          localStorage.setItem('profileURL', userData.profileURL || '');
+
+          if (role === 'admin') {
+              navigate(`/dashboard/${user.uid}`);
+          } else { 
+              navigate(`/home/${user.uid}`);
+          }
+
+      } else {
+          console.error('User document missing after auto-login. Redirecting to manual login.');
+          navigate("/log-in"); 
+      }
+
+    } catch (err) {
+      console.error("Auto-login/Signup error:", err);
+      setError("Account created, but automatic login failed. Please log in manually.");
+      navigate("/log-in");
+    }
+  }
+
+  const handleCapsLockCheck = (e) => {
+      const capsLockOn = typeof e.getModifierState === 'function' && e.getModifierState('CapsLock');
+      setCapsLock(capsLockOn);
+  };
+
+  const handleGuest = async () => {
+      try {
+        setGuestLoading(true);
+        await signInAnonymously(auth);
+        console.log("Guest signed in:", auth.currentUser?.uid);
+        setTimeout(() => {
+          navigate(`/guest/email/${auth.currentUser?.uid}`);
+        }, 500);
+      } catch (error) {
+        console.error("Guest sign-in failed:", error.message);
+        setGuestLoading(false); 
+      }
+  };
+
+  return (
+    <>
+      {showVerifyModal && (
+        <VerificationModal
+          show={showVerifyModal}
+          onClose={() => setShowVerifyModal(false)}
+          user={pendingUserData} 
+          sendVerificationEmail={sendVerificationEmail} 
+          onVerified={finalizeSignup} 
+        />
+      )}
+
+      {guestLoading && (
+        <div
+          style={{
+            position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh",
+            backgroundColor: "rgba(0,0,0,0.8)", display: "flex", flexDirection: "column",
+            justifyContent: "center", alignItems: "center", zIndex: 9999,
+            color: "white", fontSize: "24px",
+          }}
+        >
+          <img src="/Spin.gif" alt="Loading..." style={{ width: "50px", height: "50px", marginBottom: "20px" }} />
+          Creating Guest ID...
+        </div>
+      )}
+
+      <div className="create-container">
+        <div className="card-image"></div>
+        <div className="create-account-card">
+          <Card.Body className="create-body">
+            <h2>Create Account</h2>
+            {error && <Alert variant="danger">{error}</Alert>}
+            <Form onSubmit={handleSubmit}>
+              <Form.Group className="input-fullname" id="names">
+                <input className="create-input" type="text" placeholder="First Name" ref={firstNameRef} required />
+                <input className="create-input" type="text" placeholder="Last Name" ref={lastNameRef} required />
+              </Form.Group>
+              <Form.Group id="studentId">
+                <input className="create-input" type="text" placeholder="Student ID" ref={studentIdRef} required />
+              </Form.Group>
+              <Form.Group id="email">
+                <input className="create-input" type="email" placeholder="Email" ref={emailRef} required />
+              </Form.Group>
+              <Form.Group id="contactNumber">
+                <input className="create-input" type="text" placeholder="Contact Number" ref={contactNumberRef} required />
+              </Form.Group>
+
+              <Form.Group id="password">
+                <div className="password-input-wrapper"> 
+                  <input
+                    className="create-input"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Password"
+                    ref={passwordRef} 
+                    value={passwordValue} 
+                    onChange={(e) => setPasswordValue(e.target.value)} 
+                    required
+                    onKeyUp={handleCapsLockCheck}
+                    onKeyDown={handleCapsLockCheck}
+                  />
+                  <i
+                    className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'} password-toggle-icon`}
+                    onClick={() => setShowPassword((prev) => !prev)} 
+                  ></i>
+                </div>
+                 {capsLock && (
+                   <p style={{ color: 'yellow', marginTop: '5px', fontSize: '0.8em', textAlign:'left' }}>
+                     ⚠️ CAPS LOCK IS ON
+                   </p>
+                 )}
+              </Form.Group>
+
+              <Form.Group id="confirm-password">
+                 <div className="password-input-wrapper"> 
+                    <input
+                        className="create-input"
+                        type={showConfirmPassword ? "text" : "password"}
+                        placeholder="Confirm Password"
+                        ref={passwordConfirmRef} 
+                        value={confirmPasswordValue} 
+                        onChange={(e) => setConfirmPasswordValue(e.target.value)}
+                        required
+                        onKeyUp={handleCapsLockCheck}
+                        onKeyDown={handleCapsLockCheck}
+                    />
+                    {passwordsMatch && (
+                        <i className="bi bi-check-circle-fill password-match-icon"></i>
+                    )}
+                    <i
+                        className={`bi ${showConfirmPassword ? 'bi-eye-slash' : 'bi-eye'} password-toggle-icon`}
+                        onClick={() => setShowConfirmPassword((prev) => !prev)} 
+                    ></i>
+                 </div>
+              </Form.Group>
+
+              <p className="login-link">
+                Already have an account? <strong onClick={handleLogin}> Login </strong>
+              </p>
+              <button
+                disabled={loading}
+                type="submit"
+                className="create-button" 
+              >
+                {loading ? (
+                  <>
+                    <img src="/Spin_black.gif" alt="Loading..." style={{ width: "20px", height: "20px" }} />
+                    <span>Creating...</span>
+                  </>
+                ) : (
+                  "Create Account" 
+                )}
+              </button>
+              <button
+                className="guest-link" 
+                onClick={!guestLoading ? handleGuest : undefined} 
+                style={{ opacity: guestLoading ? 0.6 : 1 , backgroundColor: 'white', border: 'solid 3px #000000'}} 
+              >
+                Continue as Guest
+              </button>
+            </Form>
+          </Card.Body>
+        </div>
+      </div>
+
+       <style>{`
+          .password-input-wrapper {
+            position: relative;
+            display: flex; 
+            align-items: center; 
+            width: 100%; 
+          }
+
+          .password-input-wrapper .create-input {
+             padding-right: 60px;
+             flex-grow: 1;
+             width: auto;
+          }
+
+          .password-toggle-icon {
+            position: absolute;
+            right: 10px;
+            cursor: pointer;
+            color: #ccc;
+            font-size: 1.2em;
+            z-index: 2;
+          }
+
+          .password-match-icon {
+             position: absolute;
+             right: 40px; 
+             color: green; 
+             font-size: 1.2em;
+             z-index: 2;
+          }
+
+          .create-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background-color: #BDDDFC;
+            color: black;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%; 
+            font-size: 1em;
+            margin-top: 15px; 
+            transition: background-color 0.2s;
+          }
+          .create-button:disabled {
+            background-color: #a8c8e8; 
+            cursor: not-allowed;
+          }
+           .create-button:hover:not(:disabled) {
+            background-color: #a8c8e8; 
+          }
+
+          .login-link {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #BDDDFC;
+          }
+           .login-link strong {
+              color: #ffffff;
+              cursor: pointer;
+              text-decoration: underline;
+           }
+
+           .guest-link {
+              margin-top: 20px;
+              font-weight: bold;
+              cursor: pointer;
+              text-align: center;
+              color: #ffffff;
+              font-size: 0.9em;
+              opacity: 0.8;
+              transition: opacity 0.2s;
+           }
+           .guest-link:hover {
+              opacity: 1;
+           }
+
+       `}</style>
+    </>
+  );
+}
+
+export default CreateAccount;

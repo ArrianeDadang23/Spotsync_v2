@@ -1,0 +1,85 @@
+.user-found-procedure-body {
+    position: absolute;
+    top: 9%;
+    left: 6%;
+    background-color: white;
+    width: 80%;
+    height: 700px;
+    max-height: 800px;
+    z-index: 10;
+    border-radius: 20px;
+    padding: 10px;
+    box-shadow: 0px 2px 5px rgb(0, 0, 0, 0.7);
+    margin-left: 50px;
+}
+
+.body {
+    position: relative;
+}
+
+.user-found-procedure-body h1 {
+    font-weight: bold;
+    font-size: 20px;
+    font-weight: 1000;
+    color: #475C6F;
+}
+
+
+
+.user-found-procedure-body svg {
+    position: absolute;
+    top: 7%;
+    left: 3%;
+}
+
+.user-found-procedure-body p {
+    position: absolute;
+    width: 90%;
+    font-size: 1rem;
+    top: 25%;
+    left: 5%;
+    color: black;
+}
+
+.user-found-procedure-body button{
+    
+    background-color: #475C6F;
+    border-radius: 20px;
+    width: 200px;
+    height: 40px;
+}
+
+.user-found-procedure-body button:hover{
+    background-color: #CFE5F9;
+    color: black;
+}
+
+@media (max-width: 920px) 
+{ 
+    .user-found-procedure-body p 
+    {
+        font-size: 0.8rem;
+        margin-left: 10px;
+    }
+     
+}
+
+@media (max-width: 750px) 
+{ 
+    .user-found-procedure-body p 
+    {
+        font-size: 0.7rem;
+        margin-left: 30px;
+    }
+     
+}
+
+@media (max-width: 550px) 
+{ 
+    .user-found-procedure-body p 
+    {
+        font-size: 0.6rem;
+        margin-left: 50px;
+    }
+     
+}

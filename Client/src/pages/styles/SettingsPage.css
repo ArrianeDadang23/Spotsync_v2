@@ -1,0 +1,79 @@
+.settings-body {
+grid-template-columns: 1fr 1fr 1fr;
+gap: 12px;
+margin-bottom: 15px;
+}
+
+
+.input-full {
+width: 100%;
+padding: 12px;
+border-radius: 10px;
+border: 1px solid #dcdcdc;
+background: #fafafa;
+font-size: 14px;
+outline: none;
+}
+
+
+.input-full:focus {
+border-color: #6b8cff;
+background: #fff;
+}
+
+
+.save-btn {
+width: 100%;
+padding: 12px;
+background: #3b5bff;
+color: white;
+border-radius: 12px;
+border: none;
+font-size: 15px;
+margin-top: 15px;
+cursor: pointer;
+transition: 0.2s;
+}
+
+
+.save-btn:hover {
+background: #2f49d8;
+}
+
+
+.other-settings {
+margin-top: 30px;
+background: #fff;
+padding: 20px;
+border-radius: 20px;
+box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+
+
+.other-settings h4 {
+margin-bottom: 8px;
+font-weight: 600;
+}
+
+
+.other-settings p {
+margin: 6px 0;
+cursor: pointer;
+color: #555;
+transition: 0.2s;
+}
+
+
+.other-settings p:hover {
+color: #000;
+}
+
+
+
+
+/* ---------------- RESPONSIVE ---------------- */
+@media (max-width: 800px) {
+.input-grid {
+grid-template-columns: 1fr;
+}
+}
