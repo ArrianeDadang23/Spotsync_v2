@@ -12,7 +12,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 
 function SignInPage() {
   const navigate = useNavigate();
-  const API = "http://localhost:4000";
+  const API = "https://server.spotsync.site";
   const { signup } = useAuth(); 
   const handleLogin = () => { navigate("/log-in"); };
   const [guestLoading, setGuestLoading] = useState(false); 
