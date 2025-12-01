@@ -5,7 +5,6 @@ export default function GuestFoundMatchResults() {
   const { state } = useLocation();
   const navigate = useNavigate();
   
-  // Sort matches by overall score descending
   const allMatches = (state?.matches || [])
     .sort((a, b) => (b.scores?.overallScore || 0) - (a.scores?.overallScore || 0));
 
@@ -13,16 +12,11 @@ export default function GuestFoundMatchResults() {
   const [copiedMessage, setCopiedMessage] = useState(false);
   const [showAll, setShowAll] = useState(false);
 
-  // --- CHANGED LOGIC START ---
-  // 1. Filter for matches 75% or higher
   const highConfidenceMatches = allMatches.filter(match => (match.scores?.overallScore || 0) >= 75);
   
-  // 2. Take only the top 4 of those high scoring matches
   const topMatches = highConfidenceMatches.slice(0, 4);
 
-  // 3. Toggle between showing only top matches or everything
   const displayedMatches = showAll ? allMatches : topMatches;
-  // --- CHANGED LOGIC END ---
 
   const handleCopy = (text) => {
       navigator.clipboard.writeText(text).then(() => {

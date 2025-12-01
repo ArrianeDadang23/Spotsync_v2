@@ -94,7 +94,7 @@ function SignInPage() {
     }
   }
 
-  async function finalizeSignup() {
+async function finalizeSignup() {
     try {
       setLoading(true);
 
@@ -107,34 +107,22 @@ function SignInPage() {
         pendingUserData.studentId
       );
 
-      await new Promise((resolve, reject) => {
-        const timeout = setTimeout(() => {
-            unsub(); 
-            reject(new Error("Auth state confirmation timed out after sign-up."));
-        }, 5000); 
-        const unsub = onAuthStateChanged(auth, (user) => {
-          if (user && user.uid === userCredential.user.uid) {
-            clearTimeout(timeout);
-            unsub();
-            resolve(user);
-          } else if (!user && userCredential.user) {
-             clearTimeout(timeout);
-             unsub();
-             reject(new Error("Auth state inconsistency detected after sign-up."));
-          }
-        });
-      });
-      
       const user = auth.currentUser;
       if (!user) throw new Error("Account created but session failed.");
 
       const userDocRef = doc(db, 'users', user.uid);
-      const userDocSnap = await getDoc(userDocRef);
+      
+      let userDocSnap;
+      try {
+          userDocSnap = await getDoc(userDocRef);
+      } catch (docErr) {
+          console.log("Could not fetch user doc immediately, using defaults.");
+      }
 
       let role = 'user'; 
       let profileURL = '';
 
-      if (userDocSnap.exists()) {
+      if (userDocSnap && userDocSnap.exists()) {
         const data = userDocSnap.data();
         role = data.role || 'user';
         profileURL = data.profileURL || '';
@@ -157,18 +145,12 @@ function SignInPage() {
 
     } catch (err) {
       console.error("Signup error:", err);
-      if (err.message.includes("Auth state")) {
-          setError("Account created, but automatic login failed due to a session issue. Please sign in manually.");
-      } else {
-          setError("Account created, but automatic login failed. Please sign in manually.");
-      }
+      setError(err.message || "Account created, but automatic login failed.");
       setShowVerifyModal(false); 
-      
     } finally {
       setLoading(false);
     }
   }
-
   const handleCapsLockCheck = (e) => {
       const capsLockOn = typeof e.getModifierState === 'function' && e.getModifierState('CapsLock');
       setCapsLock(capsLockOn);

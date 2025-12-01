@@ -7,7 +7,6 @@ import { doc, getDoc } from 'firebase/firestore';
 import { sendPasswordResetEmail, onAuthStateChanged } from "firebase/auth";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
-// Combined logic from LogIn component
 function LogInPage() {
   const navigate = useNavigate();
   const handleSignIn = () => navigate('/sign-in'); 
@@ -27,9 +26,9 @@ function LogInPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [passwordValue, setPasswordValue] = useState(""); 
   const [show2FAModal, setShow2FAModal] = useState(false);
-  const [twoFACode, setTwoFACode] = useState(''); // The code user enters
-  const [generatedCode, setGeneratedCode] = useState(''); // The real code
-  const [tempUserUid, setTempUserUid] = useState(null); // Store UID while verifying
+  const [twoFACode, setTwoFACode] = useState(''); 
+  const [generatedCode, setGeneratedCode] = useState('');
+  const [tempUserUid, setTempUserUid] = useState(null); 
   const [tempRole, setTempRole] = useState(null);
 
   async function handleSubmit(e) {
@@ -48,7 +47,7 @@ function LogInPage() {
 
 
     try {
-      const userCredential = await login(studentId, password); // Correctly uses Student ID
+      const userCredential = await login(studentId, password); 
 
       await new Promise((resolve, reject) => {
         const timeout = setTimeout(() => {

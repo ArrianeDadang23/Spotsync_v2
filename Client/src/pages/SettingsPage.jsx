@@ -632,6 +632,23 @@ const handleMatchesExport = async () => {
     }
   };
 
+  const uploadImage = async (file, folder) => { 
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'profiles'); 
+    formData.append('folder', folder);
+
+    const res = await fetch('https://api.cloudinary.com/v1_1/dunltzf6e/image/upload', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const data = await res.json();
+    if (!data.secure_url) throw new Error('Upload failed: ' + (data.error?.message || 'Unknown error'));
+
+    return data.secure_url;
+};
+
   const handleUpdate = async () => {
     if (!currentUser) return;
 
