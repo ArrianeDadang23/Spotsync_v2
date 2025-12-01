@@ -80,8 +80,15 @@ export default function LoginScreen() {
         const userData = userDocSnap.data();
         const role = userData.role;
 
+        // UPDATED LOGIC HERE
         if (role === 'admin') {
-          router.replace(`/dashboard/${uid}`);
+          // Prevent admin login on mobile and show alert
+          Alert.alert(
+            "Access Restricted", 
+            "All admins are required to use a laptop or desktop to access the dashboard.",
+            [{ text: "OK" }]
+          );
+          await auth.signOut(); // Ensure they are logged out
         } else {
           router.replace(`/home-screen`);
         }
@@ -219,7 +226,7 @@ export default function LoginScreen() {
                 />
               </>
             ) : (
-                <Text style={styles.modalText}>Check your email and follow the link to reset your password.</Text>
+              <Text style={styles.modalText}>Check your email and follow the link to reset your password.</Text>
             )}
 
             {resetMessage && (

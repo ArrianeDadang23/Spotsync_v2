@@ -70,6 +70,10 @@ function UserSettingsScreen() {
   const [bio, setBio] = useState('');
   const [gender, setGender] = useState('');
   const [course, setCourse] = useState<Course | null>(null);
+  
+  // NEW: State for Year Level
+  const [yearLevel, setYearLevel] = useState(''); 
+  
   const [section, setSection] = useState('');
   const [address, setAddress] = useState('');
   const [loading, setLoading] = useState(true);
@@ -80,6 +84,10 @@ function UserSettingsScreen() {
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
   const [showCourseModal, setShowCourseModal] = useState(false);
   const [showGenderModal, setShowGenderModal] = useState(false);
+  
+  // NEW: Modal State for Year Level
+  const [showYearLevelModal, setShowYearLevelModal] = useState(false);
+
   const [password, setPassword] = useState('');
   const [checkingPassword, setCheckingPassword] = useState(false);
   const [newPassword, setNewPassword] = useState("");
@@ -91,74 +99,74 @@ function UserSettingsScreen() {
 
   const courseList: Course[] = [
     { abbr: "BSAM", name: "Bachelor of Science in Applied Mathematics" },
-  { abbr: "BSAP", name: "Bachelor of Science in Applied Physics" },
-  { abbr: "BSChem", name: "Bachelor of Science in Chemistry" },
-  { abbr: "BSES", name: "Bachelor of Science in Environmental Science " },
-  { abbr: "BSFT", name: "Bachelor of Science in Food Technology" },
+  { abbr: "BSAP", name: "Bachelor of Science in Applied Physics" },
+  { abbr: "BSChem", name: "Bachelor of Science in Chemistry" },
+  { abbr: "BSES", name: "Bachelor of Science in Environmental Science " },
+  { abbr: "BSFT", name: "Bachelor of Science in Food Technology" },
 
-  { abbr: "BSAuT", name: "Bachelor of Science in Autotronics" },
-  { abbr: "BSAT", name: "Bachelor of Science in Automotive Technology" },
-  { abbr: "BSEMT", name: "Bachelor of Science in Electro-Mechanical Technology" },
-  { abbr: "BSET", name: "Bachelor of Science in Electronics Technology" },
-  { abbr: "BSESM", name: "Bachelor of Science in Energy Systems and Management" },
-  { abbr: "BSMET", name: "Bachelor of Science in Manufacturing Engineering Technology" },
-  { abbr: "BTOM", name: "Bachelor of Technology, Operation, and Management" },
-  { abbr: "BS MathEd", name: "Bachelor of Secondary Education Major in Mathematics" },
-  { abbr: "BS SciEd", name: "Bachelor of Secondary Education Major in Science" },
-  { abbr: "BTLED", name: "Bachelor of Technology and Livelihood Education" },
-  { abbr: "BTVTed", name: "Bachelor of Technical-Vocational Teacher Education" },
-  
-  { abbr: "BTTE", name: "Bachelor of Technician Teacher Education" },
+  { abbr: "BSAuT", name: "Bachelor of Science in Autotronics" },
+  { abbr: "BSAT", name: "Bachelor of Science in Automotive Technology" },
+  { abbr: "BSEMT", name: "Bachelor of Science in Electro-Mechanical Technology" },
+  { abbr: "BSET", name: "Bachelor of Science in Electronics Technology" },
+  { abbr: "BSESM", name: "Bachelor of Science in Energy Systems and Management" },
+  { abbr: "BSMET", name: "Bachelor of Science in Manufacturing Engineering Technology" },
+  { abbr: "BTOM", name: "Bachelor of Technology, Operation, and Management" },
+  { abbr: "BS MathEd", name: "Bachelor of Secondary Education Major in Mathematics" },
+  { abbr: "BS SciEd", name: "Bachelor of Secondary Education Major in Science" },
+  { abbr: "BTLED", name: "Bachelor of Technology and Livelihood Education" },
+  { abbr: "BTVTed", name: "Bachelor of Technical-Vocational Teacher Education" },
+  
+  { abbr: "BTTE", name: "Bachelor of Technician Teacher Education" },
 
-  { abbr: "STEM", name: "Senior High School - Science, Technology, Engineering and Mathematics" },
-  
+  { abbr: "STEM", name: "Senior High School - Science, Technology, Engineering and Mathematics" },
+  
 
-  { abbr: "BSArch", name: "Bachelor of Science in Architecture" },
-  { abbr: "BSCE", name: "Bachelor of Science in Civil Engineering" },
-  { abbr: "BSCPE", name: "Bachelor of Science in Computer Engineering" },
-  { abbr: "BSEE", name: "Bachelor of Science in Electrical Engineering" },
-  { abbr: "BSECE", name: "Bachelor of Science in Electronic Engineering" },
-  { abbr: "BSGE", name: "Bachelor of Science in Geodetic Engineering" },
-  { abbr: "BSME", name: "Bachelor of Science in Mechanical Engineering" },
+  { abbr: "BSArch", name: "Bachelor of Science in Architecture" },
+  { abbr: "BSCE", name: "Bachelor of Science in Civil Engineering" },
+  { abbr: "BSCPE", name: "Bachelor of Science in Computer Engineering" },
+  { abbr: "BSEE", name: "Bachelor of Science in Electrical Engineering" },
+  { abbr: "BSECE", name: "Bachelor of Science in Electronic Engineering" },
+  { abbr: "BSGE", name: "Bachelor of Science in Geodetic Engineering" },
+  { abbr: "BSME", name: "Bachelor of Science in Mechanical Engineering" },
 
-  { abbr: "BSDS", name: "Bachelor of Science in Data Science" },
-  { abbr: "BSIT", name: "Bachelor of Science in Information Technology" },
-  { abbr: "BSTCM", name: "Bachelor of Science in Technology Communication Management" },
-  { abbr: "BSCS", name: "Bachelor of Science in Computer Science" },
+  { abbr: "BSDS", name: "Bachelor of Science in Data Science" },
+  { abbr: "BSIT", name: "Bachelor of Science in Information Technology" },
+  { abbr: "BSTCM", name: "Bachelor of Science in Technology Communication Management" },
+  { abbr: "BSCS", name: "Bachelor of Science in Computer Science" },
 
-  { abbr: "COM", name: "College of Medicine (Night Class)" },
+  { abbr: "COM", name: "College of Medicine (Night Class)" },
 
-  { abbr: "MSAMS", name: "Master of Science in Applied Mathematics Sciences" },
-  { abbr: "MSETS", name: "Master of Science in Environmental Science and Technology" },
+  { abbr: "MSAMS", name: "Master of Science in Applied Mathematics Sciences" },
+  { abbr: "MSETS", name: "Master of Science in Environmental Science and Technology" },
 
-  { abbr: "MITO", name: "Master in Industrial Technology and Operations" },
+  { abbr: "MITO", name: "Master in Industrial Technology and Operations" },
 
-  { abbr: "DTE", name: "Doctor in Technology Education" },
-  { abbr: "PhD MathEdSci", name: "Doctor of Philosophy in Mathematics Sciences " },
-  { abbr: "PhD MathEd", name: "Doctor of Philosophy in Mathematics Education" },
-  { abbr: "PhD SciEd Chem", name: "Doctor of Philosophy in Science Education Major in Chemistry" },
-  { abbr: "PhD EPM", name: "Doctor of Philosophy in Educational Planning and Management" },
-  { abbr: "MEPM", name: "Master in Education Planning and Management" },
-  { abbr: "MATESL", name: "Master of Arts in Teaching English as Second Language" },
-  { abbr: "MATSpEd", name: "Master of Arts in Teaching Special Education" },
-  { abbr: "MSMathEd", name: "Master of Science in Mathematics Education" },
-  { abbr: "MSEd Physics", name: "Master of Science Education Major in Physics" },
-  { abbr: "MSTMath", name: "Master of Science in Teaching Mathematics" },
-  { abbr: "MPA", name: "Master in Public Administration" },
-  { abbr: "MTTE", name: "Master in Technician Teacher Education" },
-  { abbr: "MTTEd", name: "Master of Technical and Technology Education" },
+  { abbr: "DTE", name: "Doctor in Technology Education" },
+  { abbr: "PhD MathEdSci", name: "Doctor of Philosophy in Mathematics Sciences " },
+  { abbr: "PhD MathEd", name: "Doctor of Philosophy in Mathematics Education" },
+  { abbr: "PhD SciEd Chem", name: "Doctor of Philosophy in Science Education Major in Chemistry" },
+  { abbr: "PhD EPM", name: "Doctor of Philosophy in Educational Planning and Management" },
+  { abbr: "MEPM", name: "Master in Education Planning and Management" },
+  { abbr: "MATESL", name: "Master of Arts in Teaching English as Second Language" },
+  { abbr: "MATSpEd", name: "Master of Arts in Teaching Special Education" },
+  { abbr: "MSMathEd", name: "Master of Science in Mathematics Education" },
+  { abbr: "MSEd Physics", name: "Master of Science Education Major in Physics" },
+  { abbr: "MSTMath", name: "Master of Science in Teaching Mathematics" },
+  { abbr: "MPA", name: "Master in Public Administration" },
+  { abbr: "MTTE", name: "Master in Technician Teacher Education" },
+  { abbr: "MTTEd", name: "Master of Technical and Technology Education" },
 
-  { abbr: "MEng", name: "Master of Engineering Program" },
-  { abbr: "MSEE", name: "Master of Science in Electrical Engineering" },
-  { abbr: "MSSDPS", name: "Master of Science in Sustainable Development Professional Science" },
-  { abbr: "MPSEM", name: "Master in Power System Engineering and Management" },
+  { abbr: "MEng", name: "Master of Engineering Program" },
+  { abbr: "MSEE", name: "Master of Science in Electrical Engineering" },
+  { abbr: "MSSDPS", name: "Master of Science in Sustainable Development Professional Science" },
+  { abbr: "MPSEM", name: "Master in Power System Engineering and Management" },
 
-  { abbr: "MSTCM", name: "Master of Science in Technology Communication Management" },
-  { abbr: "MIT", name: "Master in Information Technology" },
+  { abbr: "MSTCM", name: "Master of Science in Technology Communication Management" },
+  { abbr: "MIT", name: "Master in Information Technology" },
 
-  { abbr: "MPS-DSPE", name: "Master in Public Sector Major in Digital Service Platforms and E-Governance" },
-  { abbr: "MPS-SD", name: "Master in Public Sector Innovation Major in Sustainable Development" },
-  { abbr: "MPS-PPS", name: "Master in Public Sector Innovation Major in Public Policy Studies" },
+  { abbr: "MPS-DSPE", name: "Master in Public Sector Major in Digital Service Platforms and E-Governance" },
+  { abbr: "MPS-SD", name: "Master in Public Sector Innovation Major in Sustainable Development" },
+  { abbr: "MPS-PPS", name: "Master in Public Sector Innovation Major in Public Policy Studies" },
   ];
 
   const initials = `${firstName?.[0] || ''}${lastName?.[0] || ''}`.toUpperCase();
@@ -180,6 +188,10 @@ function UserSettingsScreen() {
           setBio(data.bio || '');
           setGender(data.gender || '');
           setCourse(data.course || null);
+          
+          // NEW: Fetch yearLevel
+          setYearLevel(data.yearLevel || '');
+          
           setSection(data.section || '');
           setAddress(data.address || '');
           setProfileURL(data.profileURL || '');
@@ -247,12 +259,18 @@ function UserSettingsScreen() {
       if (coverImage) {
         updatedCoverURL = await uploadImage(coverImage, `users/${currentUser.uid}`);
       }
+      
       const updatedData = {
         firstName, lastName, middleName, email, contactNumber,
         bio, gender, course, section, address,
+        
+        // NEW: Include yearLevel in update
+        yearLevel,
+        
         profileURL: updatedProfileURL,
         coverURL: updatedCoverURL,
       };
+      
       const userRef = doc(db, 'users', currentUser.uid);
       await updateDoc(userRef, updatedData);
       Alert.alert("Success", "Profile Information Updated!");
@@ -580,6 +598,15 @@ function UserSettingsScreen() {
                     <Text style={styles.pickerButtonText} numberOfLines={1}>{course?.name || "Select Course"}</Text>
                 </TouchableOpacity>
             </View>
+            
+            {/* NEW: Year Level Input Group */}
+            <View style={styles.inputGroup}>
+                <Text style={styles.label}>Year Level</Text>
+                <TouchableOpacity style={styles.pickerButton} onPress={() => setShowYearLevelModal(true)}>
+                    <Text style={styles.pickerButtonText}>{yearLevel || "Select Year Level"}</Text>
+                </TouchableOpacity>
+            </View>
+
             <View style={styles.inputGroup}>
                 <Text style={styles.label}>Section</Text>
                 <TextInput style={styles.input} placeholder="Enter your section" placeholderTextColor={PLACEHOLDER_COLOR} value={section} onChangeText={setSection} />
@@ -656,6 +683,20 @@ function UserSettingsScreen() {
         </TouchableOpacity>
        </Modal>
        
+       {/* NEW: Year Level Modal */}
+       <Modal visible={showYearLevelModal} transparent={true} animationType="slide">
+         <TouchableOpacity style={styles.modalContainer} activeOpacity={1} onPressOut={() => setShowYearLevelModal(false)}>
+            <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>Select Year Level</Text>
+                {['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year', 'Irregular', 'Masteral', 'Doctoral'].map((yl) => (
+                    <TouchableOpacity key={yl} style={styles.modalItem} onPress={() => {setYearLevel(yl); setShowYearLevelModal(false)}}>
+                        <Text>{yl}</Text>
+                    </TouchableOpacity>
+                ))}
+            </View>
+        </TouchableOpacity>
+       </Modal>
+       
        <Modal visible={showCourseModal} transparent={true} animationType="slide">
            <View style={styles.modalContainer}>
               <View style={styles.modalContent}>
@@ -671,45 +712,45 @@ function UserSettingsScreen() {
                   />
                    <TouchableOpacity style={styles.closeButtonWide} onPress={() => setShowCourseModal(false)}>
                         <Text style={styles.closeButtonText}>Close</Text>
-                    </TouchableOpacity>
+                   </TouchableOpacity>
               </View>
           </View>
        </Modal>
        
        <Modal visible={showPasswordModal} transparent={true} animationType="slide">
            <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-                <Text style={styles.modalTitle}>Confirm Your Password</Text>
-                <TextInput style={styles.input} placeholder="Enter your password" placeholderTextColor={PLACEHOLDER_COLOR} secureTextEntry value={password} onChangeText={setPassword}/>
-                <View style={styles.modalButtonRow}>
-                    <TouchableOpacity style={styles.closeButton} onPress={() => setShowPasswordModal(false)}>
-                        <Text style={styles.closeButtonText}>Cancel</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.saveButton} onPress={handleConfirmPassword} disabled={checkingPassword}>
-                        {checkingPassword ? <ActivityIndicator color="#fff" /> : <Text style={styles.saveButtonText}>Confirm</Text>}
-                    </TouchableOpacity>
-                </View>
-            </View>
-        </View>
+           <View style={styles.modalContent}>
+               <Text style={styles.modalTitle}>Confirm Your Password</Text>
+               <TextInput style={styles.input} placeholder="Enter your password" placeholderTextColor={PLACEHOLDER_COLOR} secureTextEntry value={password} onChangeText={setPassword}/>
+               <View style={styles.modalButtonRow}>
+                   <TouchableOpacity style={styles.closeButton} onPress={() => setShowPasswordModal(false)}>
+                       <Text style={styles.closeButtonText}>Cancel</Text>
+                   </TouchableOpacity>
+                   <TouchableOpacity style={styles.saveButton} onPress={handleConfirmPassword} disabled={checkingPassword}>
+                       {checkingPassword ? <ActivityIndicator color="#fff" /> : <Text style={styles.saveButtonText}>Confirm</Text>}
+                   </TouchableOpacity>
+               </View>
+           </View>
+       </View>
        </Modal>
        
        <Modal visible={showChangePasswordModal} transparent={true} animationType="slide">
            <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-                <Text style={styles.modalTitle}>Change Password</Text>
-                <TextInput style={styles.input} placeholder="Current Password" placeholderTextColor={PLACEHOLDER_COLOR} secureTextEntry onChangeText={setPassword} />
-                <TextInput style={styles.input} placeholder="New Password" placeholderTextColor={PLACEHOLDER_COLOR} secureTextEntry onChangeText={setNewPassword} />
-                <TextInput style={styles.input} placeholder="Confirm New Password" placeholderTextColor={PLACEHOLDER_COLOR} secureTextEntry onChangeText={setConfirmNewPassword} />
-                <View style={styles.modalButtonRow}>
-                    <TouchableOpacity style={styles.closeButton} onPress={() => setShowChangePasswordModal(false)}>
-                        <Text style={styles.closeButtonText}>Cancel</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.saveButton} onPress={handleChangePassword} disabled={changingPassword}>
-                        {changingPassword ? <ActivityIndicator color="#fff" /> : <Text style={styles.saveButtonText}>Next</Text>}
-                    </TouchableOpacity>
-                </View>
-            </View>
-        </View>
+           <View style={styles.modalContent}>
+               <Text style={styles.modalTitle}>Change Password</Text>
+               <TextInput style={styles.input} placeholder="Current Password" placeholderTextColor={PLACEHOLDER_COLOR} secureTextEntry onChangeText={setPassword} />
+               <TextInput style={styles.input} placeholder="New Password" placeholderTextColor={PLACEHOLDER_COLOR} secureTextEntry onChangeText={setNewPassword} />
+               <TextInput style={styles.input} placeholder="Confirm New Password" placeholderTextColor={PLACEHOLDER_COLOR} secureTextEntry onChangeText={setConfirmNewPassword} />
+               <View style={styles.modalButtonRow}>
+                   <TouchableOpacity style={styles.closeButton} onPress={() => setShowChangePasswordModal(false)}>
+                       <Text style={styles.closeButtonText}>Cancel</Text>
+                   </TouchableOpacity>
+                   <TouchableOpacity style={styles.saveButton} onPress={handleChangePassword} disabled={changingPassword}>
+                       {changingPassword ? <ActivityIndicator color="#fff" /> : <Text style={styles.saveButtonText}>Next</Text>}
+                   </TouchableOpacity>
+               </View>
+           </View>
+       </View>
        </Modal>
 
       <VerificationModal
