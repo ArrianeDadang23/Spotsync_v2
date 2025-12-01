@@ -21,11 +21,11 @@ export default function Onboarding() {
     ).start();
   }, [floatAnim]);
 
-  // 2. Updated Handler: Save state locally before navigating
+
   const handleFinishOnboarding = async () => {
     try {
       await AsyncStorage.setItem('hasLaunched', 'true');
-      router.replace('/create-account'); // Or '/sign-in' depending on your flow
+      router.replace('/create-account'); 
     } catch (error) {
       console.log('Error saving data', error);
       router.replace('/create-account');
@@ -34,7 +34,7 @@ export default function Onboarding() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Update the onPress to call the local function inside the component */}
+      
       <TouchableOpacity
         style={styles.skipButton}
         onPress={handleFinishOnboarding}
@@ -47,9 +47,9 @@ export default function Onboarding() {
         initialPage={0}
         onPageSelected={(e) => setCurrentPage(e.nativeEvent.position)}
       >
-        {/* ... (Your existing pages 1, 2, 3 remain exactly the same) ... */}
+      
         
-        {/* Page 1 */}
+      
         <View key="1" style={styles.page}>
           <View style={styles.circle}>
             <Text style={styles.bigTitle}>SpotSync</Text>
@@ -64,7 +64,7 @@ export default function Onboarding() {
           </Text>
         </View>
 
-        {/* Page 2 */}
+      
         <View key="2" style={styles.page}>
           <View style={styles.circle}>
             <Text style={styles.bigTitle}>SpotSync</Text>
@@ -79,7 +79,7 @@ export default function Onboarding() {
           </Text>
         </View>
 
-        {/* Page 3 */}
+      
         <View key="3" style={styles.page}>
           <View style={styles.circle}>
             <Text style={styles.bigTitle}>SpotSync</Text>
@@ -94,7 +94,7 @@ export default function Onboarding() {
           </Text>
         </View>
 
-        {/* Page 4 */}
+      
         <View key="4" style={styles.page}>
           <View style={styles.circle}>
             <Text style={styles.bigTitle}>SpotSync</Text>
@@ -107,7 +107,7 @@ export default function Onboarding() {
           <Text style={styles.subtitle}>
             Stay updated every step of the way with instant alerts when a potential match is detected.
           </Text>
-          {/* Update the onPress here as well */}
+      
           <TouchableOpacity style={styles.button} onPress={handleFinishOnboarding}>
             <Text style={styles.buttonText}>Get Started</Text>
           </TouchableOpacity>

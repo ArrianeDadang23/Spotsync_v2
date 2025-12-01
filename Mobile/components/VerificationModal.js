@@ -13,7 +13,7 @@ import { db } from "../firebase";
 import createVerificationCode from "../utils/createVerificationCode";
 
 const PLACEHOLDER_COLOR = "#A9A9A9";
-const EXPIRY_SECONDS = 120; // 2 minutes
+const EXPIRY_SECONDS = 120; 
 
 function VerificationModal({ show, user, onVerified, onClose, sendVerificationEmail, initialCode }) {
   const [code, setCode] = useState("");
@@ -26,7 +26,7 @@ function VerificationModal({ show, user, onVerified, onClose, sendVerificationEm
   const [availableCodes, setAvailableCodes] = useState([]);
   const timerRef = useRef(null);
 
-  // Start timer helper
+  
   const startTimer = () => {
     if (timerRef.current) clearInterval(timerRef.current);
     setCountdown(EXPIRY_SECONDS);
@@ -44,7 +44,7 @@ function VerificationModal({ show, user, onVerified, onClose, sendVerificationEm
   useEffect(() => {
     let unsubscribe = () => {};
     if ((show ?? true) && user?.email) {
-      // Seed initial code if provided (don't overwrite later)
+  
       const initialEntry = initialCode
         ? [{ code: String(initialCode).trim(), createdAt: "initial", id: "initial" }]
         : [];
@@ -63,7 +63,7 @@ function VerificationModal({ show, user, onVerified, onClose, sendVerificationEm
           });
         });
 
-        // Merge: keep any initial entry that isn't present in the DB results
+  
         const merged = [...codesFromDb];
         if (initialCode) {
           const exists = codesFromDb.some(c => c.code === String(initialCode).trim());
@@ -115,11 +115,11 @@ function VerificationModal({ show, user, onVerified, onClose, sendVerificationEm
           return;
         }
 
-        // If match is the seeded initial entry, accept it here (backend will clean up/confirm later)
+        
         if (match.id !== "initial") {
-          // Validate expiry (Firestore Timestamp expected)
+        
           if (!match.createdAt || !match.createdAt.seconds) {
-            // if createdAt is malformed, fail-safe: allow only very recent (skip)
+        
             setError("Code validation failed. Please request a new code.");
             setLoading(false);
             return;
@@ -159,13 +159,13 @@ function VerificationModal({ show, user, onVerified, onClose, sendVerificationEm
     setCode("");
 
     try {
-      // IMPORTANT: Use the same seed the parent used (studentId)
-      const seed = user?.studentId ?? user?.studentId ?? ""; // fallback to studentId
+     
+      const seed = user?.studentId ?? user?.studentId ?? "";
       const newCode = await createVerificationCode(user.email, seed);
       if (sendVerificationEmail) {
         await sendVerificationEmail(user, newCode);
         setSuccessMessage(`New code sent to ${user.email}`);
-        // add new code to availableCodes immediately to improve UX
+        
         setAvailableCodes(prev => {
           const exists = prev.some(c => c.code === String(newCode).trim());
           if (exists) return prev;
@@ -243,7 +243,7 @@ function VerificationModal({ show, user, onVerified, onClose, sendVerificationEm
   );
 }
 
-// (styles unchanged - paste your existing style object)
+
 const styles = StyleSheet.create({
   modalOverlay: { flex: 1, backgroundColor: "rgba(0, 0, 0, 0.6)", justifyContent: "center", alignItems: "center" },
   modalContainer: { width: "85%", backgroundColor: "white", borderRadius: 16, padding: 24, alignItems: "center", elevation: 5 },

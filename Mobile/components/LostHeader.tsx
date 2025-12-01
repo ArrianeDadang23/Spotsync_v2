@@ -11,8 +11,8 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { signOut } from 'firebase/auth'; // No longer needed here
-import { auth } from '../firebase'; // No longer needed here
+import { signOut } from 'firebase/auth'; 
+import { auth } from '../firebase'; 
 
 export default function LostHeader({ userData }) {
   const { currentUser, logout } = useAuth();
@@ -47,7 +47,7 @@ export default function LostHeader({ userData }) {
     try {
       await signOut(auth);
             setDropdownVisible(false);
-            // Use replace to prevent the user from navigating back to the home screen
+   
             router.replace('/login');
     } catch (error) {
       console.error('Logout error:', error);
@@ -81,7 +81,7 @@ export default function LostHeader({ userData }) {
         )}
       </View>
 
-      {/* Profile Section */}
+   
       <TouchableOpacity
         style={styles.profileButton}
         onPress={() => setDropdownVisible(true)}
@@ -95,7 +95,7 @@ export default function LostHeader({ userData }) {
         )}
       </TouchableOpacity>
 
-      {/* Dropdown Menu */}
+   
       <Modal transparent={true} visible={isDropdownVisible} animationType="fade">
         <TouchableWithoutFeedback onPress={() => setDropdownVisible(false)}>
           <View style={styles.modalOverlay}>

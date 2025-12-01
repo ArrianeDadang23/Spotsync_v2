@@ -199,15 +199,15 @@ const styles = {
         padding: '0 10px',
         justifyContent: 'flex-start',
     },
-    actionButton: (isLost, disabled) => ({ // Updated to accept disabled state
+    actionButton: (isLost, disabled) => ({
         padding: '15px 30px',
-        backgroundColor: disabled ? '#ccc' : (isLost ? '#dc3545' : '#28a745'), // Change color if disabled
+        backgroundColor: disabled ? '#ccc' : (isLost ? '#dc3545' : '#28a745'), 
         color: 'white',
         border: 'none',
         borderRadius: '10px',
         fontWeight: '600',
         fontSize: '1.1rem',
-        cursor: disabled ? 'not-allowed' : 'pointer', // Change cursor if disabled
+        cursor: disabled ? 'not-allowed' : 'pointer',
         display: 'flex',
         alignItems: 'center',
         gap: '10px',
@@ -216,10 +216,9 @@ const styles = {
         minWidth: '250px',
         justifyContent: 'center',
     }),
-    actionButtonHover: (isLost, disabled) => ({ // Updated to accept disabled state
-        backgroundColor: disabled ? '#ccc' : (isLost ? '#c82333' : '#218838'), // Hover state for enabled buttons
+    actionButtonHover: (isLost, disabled) => ({
+        backgroundColor: disabled ? '#ccc' : (isLost ? '#c82333' : '#218838'), 
     }),
-    // Added a specific style for the tooltip/warning text
     profileWarningText: {
       color: '#dc3545', 
       fontSize: '13px', 
@@ -313,10 +312,9 @@ function HomePage() {
   const hasEmptyFields = userData
     ? requiredFields.some((field) => {
         const value = userData[field];
-        // Check for undefined, null, or empty string (including if it's an object/array field like 'course' that hasn't been properly set, though a simple string check is used here for brevity based on the original logic)
         return value === undefined || value === null || (typeof value === 'string' && value.trim() === "") || (typeof value === 'object' && Object.keys(value).length === 0);
       })
-    : true; // Default to true if userData is null/not yet loaded
+    : true; 
 
 
   const handleNavigate = (path) => {
@@ -335,7 +333,6 @@ useEffect(() => {
         const data = userDocSnap.data();
         setUserData(data);
 
-        // This part seems to be for legacy or specific need. Keeping it as is.
         Object.entries(data).forEach(([key, value]) => {
           if (value !== undefined && value !== null) localStorage.setItem(key, value);
         });
@@ -414,7 +411,6 @@ useEffect(() => {
   };
 }, []); 
 
-// Removed the original hasEmptyFields check here as it's now defined above with more rigor
 
   useEffect(() => {
     if (hasEmptyFields) {
@@ -492,7 +488,7 @@ useEffect(() => {
                 )}
             </div>
             
-            <div style={{ ...styles.actionWrapper, flexDirection: 'column' }}> {/* Changed to column to stack buttons and warning */}
+            <div style={{ ...styles.actionWrapper, flexDirection: 'column' }}>
               
               <div style={{ display: 'flex', gap: '20px', marginBottom: hasEmptyFields ? '10px' : '0' }}>
                 <button 

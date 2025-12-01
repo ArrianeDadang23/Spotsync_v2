@@ -12,18 +12,18 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
-// Define placeholder color
+
 const PLACEHOLDER_COLOR = "#A9A9A9";
 
 interface RatingModalProps {
   show: boolean;
   onClose: () => void;
-  onSubmit: (rating: number, feedback: string) => Promise<void>; // Make onSubmit async
+  onSubmit: (rating: number, feedback: string) => Promise<void>;
   isSubmitting: boolean;
 }
 
 function RatingModal({ show, onClose, onSubmit, isSubmitting }: RatingModalProps) {
-  const [rating, setRating] = useState<number>(0); // 0 = not rated
+  const [rating, setRating] = useState<number>(0);
   const [feedback, setFeedback] = useState<string>("");
 
   const handleStarPress = (index: number) => {
@@ -36,7 +36,7 @@ function RatingModal({ show, onClose, onSubmit, isSubmitting }: RatingModalProps
           return;
       }
       await onSubmit(rating, feedback);
-      // Reset state after successful submit (optional, depends on parent logic)
+      
       setRating(0);
       setFeedback("");
       router.push('/ItemManagementScreen')
@@ -53,7 +53,7 @@ function RatingModal({ show, onClose, onSubmit, isSubmitting }: RatingModalProps
         <View style={styles.modalContent} onStartShouldSetResponder={() => true}>
           <Text style={styles.modalTitle}>Rate Match Accuracy</Text>
 
-          {/* Star Rating */}
+      
           <View style={styles.starsContainer}>
             {[...Array(5)].map((_, index) => (
               <TouchableOpacity key={index} onPress={() => handleStarPress(index)}>
@@ -66,18 +66,18 @@ function RatingModal({ show, onClose, onSubmit, isSubmitting }: RatingModalProps
             ))}
           </View>
 
-          {/* Feedback Input */}
+      
           <TextInput
             style={styles.feedbackInput}
             placeholder="Optional: Provide feedback on the matches..."
-            placeholderTextColor={PLACEHOLDER_COLOR} // Apply color
+            placeholderTextColor={PLACEHOLDER_COLOR} 
             value={feedback}
             onChangeText={setFeedback}
             multiline
             numberOfLines={4}
           />
 
-          {/* Buttons */}
+          
           <View style={styles.buttonRow}>
             <TouchableOpacity style={styles.closeButton} onPress={onClose} disabled={isSubmitting}>
               <Text style={styles.closeButtonText}>Cancel</Text>
@@ -85,7 +85,7 @@ function RatingModal({ show, onClose, onSubmit, isSubmitting }: RatingModalProps
             <TouchableOpacity
               style={[styles.submitButton, isSubmitting && styles.buttonDisabled]}
               onPress={handleSubmit}
-              disabled={isSubmitting || rating === 0} // Disable if no rating selected
+              disabled={isSubmitting || rating === 0} 
             >
               {isSubmitting ? (
                 <ActivityIndicator color="#fff" size="small" />
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     borderRadius: 8,
     padding: 10,
-    textAlignVertical: 'top', // For multiline input
+    textAlignVertical: 'top', 
     marginBottom: 20,
     fontSize: 16
   },

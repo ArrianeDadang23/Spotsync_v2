@@ -4,7 +4,6 @@ import { useRouter } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 import { realtimeDB } from '../firebase';
-// ✨ 1. Import 'get' and 'update' for marking as read
 import {
   ref,
   onValue,
@@ -52,11 +51,9 @@ export default function BottomNavBar({ activeScreen }) {
     return () => unsubscribe();
   }, [currentUser]);
 
-  // ✨ 2. New function to update all notifications in the database
   const markAllAsRead = async () => {
     if (!currentUser) return;
 
-    // Find all notifications for this user that are unread
     const notifRef = ref(realtimeDB, `notifications/${currentUser.uid}`);
     const unreadQuery = query(
       notifRef,
@@ -69,28 +66,23 @@ export default function BottomNavBar({ activeScreen }) {
 
       if (snapshot.exists()) {
         const updates = {};
-        // Prepare a single "multi-path" update for efficiency
         snapshot.forEach((childSnapshot) => {
           const key = childSnapshot.key;
           updates[`notifications/${currentUser.uid}/${key}/read`] = true;
         });
 
-        // Send the update to the database
         await update(ref(realtimeDB), updates);
-        // The 'onValue' listener will now automatically update the count to 0
       }
     } catch (error) {
       console.error('Error marking notifications as read: ', error);
     }
   };
 
-  // ✨ 3. Update handlePress to call markAllAsRead
   const handlePress = (item) => {
     router.replace(item.route);
 
-    // If the user clicks 'Notifs' and there are unread items...
     if (item.name === 'Notifs' && notificationCount > 0) {
-      markAllAsRead(); // Mark them as read
+      markAllAsRead(); 
     }
   };
 
@@ -100,7 +92,6 @@ export default function BottomNavBar({ activeScreen }) {
         <TouchableOpacity
           key={item.name}
           style={styles.navButton}
-          // ✨ 4. Pass the whole 'item' object to handlePress
           onPress={() => handlePress(item)}
         >
           <View style={styles.iconContainer}>

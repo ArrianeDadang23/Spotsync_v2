@@ -269,6 +269,24 @@ function GuestReportFoundPage() {
       read: false,
     });
   };
+  
+  // Progress bar simulation logic
+  useEffect(() => {
+    let interval;
+    if (isMatching && progress < 99) {
+      interval = setInterval(() => {
+        setProgress(prev => {
+          const newProgress = prev + Math.random() * 5; // Increment by a random small amount
+          return newProgress < 99 ? newProgress : 99;
+        });
+      }, 500); // Update every 500ms
+    } else if (!isMatching && progress < 100) {
+      // Final jump to 100% when matching is complete and component is about to navigate
+      setProgress(100); 
+    }
+    
+    return () => clearInterval(interval);
+  }, [isMatching, progress]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -339,6 +357,9 @@ function GuestReportFoundPage() {
 
       if (currentUser) {
         setIsMatching(true);
+        // Reset progress before starting matching
+        setProgress(0); 
+
         const matchResponse = await fetch(`${API}/api/match/found-to-lost`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -356,6 +377,10 @@ function GuestReportFoundPage() {
         }
         const matches = await matchResponse.json();
         const top4Matches = matches.slice(0, 4); 
+        
+        // Finalize progress before navigation
+        setProgress(100);
+
 
         await notifyUser(
           currentUser.uid,
@@ -425,6 +450,7 @@ function GuestReportFoundPage() {
     }
     setIsSubmitting(false);
     setIsMatching(false);
+    setProgress(0); // Reset progress on failure/completion path
   };
 
   const formStyles = {

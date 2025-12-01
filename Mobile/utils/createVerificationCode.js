@@ -1,12 +1,6 @@
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase";
 
-/**
- * Creates a 6-digit verification code and saves it to Firestore.
- * @param {string} email - The user's email address.
- * @param {string | null} [uid] - The user's unique ID (optional).
- * @returns {Promise<string>} The generated 6-digit code.
- */
 async function createVerificationCode(
   email: string,
   uid: string | null = null

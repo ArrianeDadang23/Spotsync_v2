@@ -11,11 +11,10 @@ import {
 import { useAuth } from "../context/AuthContext";
 import { useRouter } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { signOut } from "firebase/auth"; // No longer needed here
-import { auth } from "../firebase"; // No longer needed here
+import { signOut } from "firebase/auth"; 
+import { auth } from "../firebase"; 
 
 export default function FoundHeader({ userData }) {
-  // ✅ MODIFIED: Get the new logout function from context
   const { currentUser, logout } = useAuth(); 
   const router = useRouter();
   const [isDropdownVisible, setDropdownVisible] = useState(false);
@@ -26,7 +25,6 @@ export default function FoundHeader({ userData }) {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   };
 
-  // ✅ Check if profile is complete (same style as LostHeader)
   const isProfileComplete = () => {
     return (
       userData &&
@@ -45,12 +43,10 @@ export default function FoundHeader({ userData }) {
     );
   };
 
-  // ✅ MODIFIED: Use the context's logout function
   const handleLogout = async () => {
     try {
       await signOut(auth);
                   setDropdownVisible(false);
-                  // Use replace to prevent the user from navigating back to the home screen
                   router.replace('/login');
     } catch (error) {
       console.error("Logout error:", error);
@@ -59,13 +55,12 @@ export default function FoundHeader({ userData }) {
 
   const handlePostPress = () => {
     if (isProfileComplete()) {
-      router.push("/UserFoundProcedureScreen"); // Navigate to post page
+      router.push("/UserFoundProcedureScreen");
     }
   };
 
   return (
     <View style={styles.headerContainer}>
-      {/* Post Button + Message */}
       <View style={styles.postSection}>
         <TouchableOpacity
           style={[
@@ -85,7 +80,6 @@ export default function FoundHeader({ userData }) {
         )}
       </View>
 
-      {/* Profile Section */}
       <TouchableOpacity
         style={styles.profileButton}
         onPress={() => setDropdownVisible(true)}
@@ -102,7 +96,6 @@ export default function FoundHeader({ userData }) {
         )}
       </TouchableOpacity>
 
-      {/* Dropdown Menu */}
       <Modal transparent={true} visible={isDropdownVisible} animationType="fade">
         <TouchableWithoutFeedback onPress={() => setDropdownVisible(false)}>
           <View style={styles.modalOverlay}>

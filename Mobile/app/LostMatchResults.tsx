@@ -172,10 +172,8 @@ function LostMatchResults() {
 
   const allMatches = itemData.topMatches || [];
   
-  // Filter matches that are 75% or above
   const highConfidenceMatches = allMatches.filter(match => match.scores.overallScore >= 75);
   
-  // Determine what to display based on state
   const displayedMatches = showAll ? allMatches : highConfidenceMatches;
 
   return (
@@ -184,7 +182,6 @@ function LostMatchResults() {
         <View style={styles.matchesSection}>
           {allMatches.length > 0 ? (
             <>
-              {/* If there are matches, but none above 75%, and we aren't showing all yet, tell the user */}
               {!showAll && highConfidenceMatches.length === 0 && (
                 <View style={styles.card}>
                    <Text style={styles.noMatchesText}>
@@ -208,7 +205,6 @@ function LostMatchResults() {
           )}
         </View>
 
-        {/* Only show the button if there are matches hidden (i.e. if total matches > high confidence matches) */}
         {allMatches.length > highConfidenceMatches.length && (
             <TouchableOpacity 
                 style={styles.seeAllButton} 

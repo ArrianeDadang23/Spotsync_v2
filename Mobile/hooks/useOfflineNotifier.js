@@ -2,56 +2,41 @@ import React, { useState, useRef, useCallback } from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-/**
- * A custom hook to display an "Offline" notification panel.
- * It provides a component to render and a function to call when a network error occurs.
- *
- * @returns {object} An object containing:
- * - `notifyOffline`: (Function) Call this in your 'catch' block. It takes the function to retry as an argument.
- * - `OfflinePanelComponent`: (Component) The modal component to render in your screen's JSX.
- */
 export const useOfflineNotifier = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
   
-  // Use a ref to store the function. This avoids state-related re-render issues.
   const reloadActionRef = useRef(null);
 
-  /**
-   * Call this function from your 'catch' block when a network error occurs.
-   * @param {Function} onReload - The function to execute when the "Reload" button is pressed (e.g., your fetchData function).
-   */
   const notifyOffline = useCallback((onReload) => {
     reloadActionRef.current = onReload;
     setIsVisible(true);
   }, []);
 
-  // Closes the panel and resets its state
   const closePanel = () => {
     setIsVisible(false);
     setIsRetrying(false);
     reloadActionRef.current = null;
   };
 
-  // Asynchronously runs the stored reload action
   const handleReload = async () => {
     if (reloadActionRef.current) {
       setIsRetrying(true);
       try {
-        // Run the stored function (e.g., fetchData)
+
         await reloadActionRef.current();
-        // If it succeeds, close the panel
+
         closePanel();
       } catch (error) {
-        // If it fails again, stop the spinner but keep the panel open
+
         console.error("Retry failed:", error);
         setIsRetrying(false);
-        // You could add a small "Try Again" message here
+
       }
     }
   };
 
-  // This is the actual component you will render in your screen
+
   const OfflinePanelComponent = () => (
     <Modal
       visible={isVisible}
@@ -71,7 +56,7 @@ export const useOfflineNotifier = () => {
             <TouchableOpacity 
               style={styles.modalButtonSecondary} 
               onPress={closePanel}
-              disabled={isRetrying} // Disable if a retry is in progress
+              disabled={isRetrying}
             >
               <Text style={styles.modalButtonTextSecondary}>Close</Text>
             </TouchableOpacity>
@@ -79,7 +64,7 @@ export const useOfflineNotifier = () => {
             <TouchableOpacity 
               style={styles.modalButtonPrimary} 
               onPress={handleReload}
-              disabled={isRetrying} // Disable if a retry is in progress
+              disabled={isRetrying}
             >
               {isRetrying ? (
                 <ActivityIndicator color="#FFFFFF" />
@@ -93,11 +78,11 @@ export const useOfflineNotifier = () => {
     </Modal>
   );
 
-  // Expose the function to show the panel and the panel component itself
+  
   return { notifyOffline, OfflinePanelComponent };
 };
 
-// --- STYLES ---
+
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
@@ -142,7 +127,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 5,
     alignItems: 'center',
-    minHeight: 45, // for ActivityIndicator
+    minHeight: 45, 
     justifyContent: 'center',
   },
   modalButtonSecondary: {

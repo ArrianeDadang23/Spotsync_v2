@@ -10,24 +10,20 @@ import {
   Alert
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-// 1. Import useRouter
 import { useRouter } from 'expo-router';
 
-// Define placeholder color
 const PLACEHOLDER_COLOR = "#A9A9A9";
 
-// Define component props interface
 interface GuestRatingModalProps {
   show: boolean;
   onClose: () => void;
-  onSubmit: (rating: number, feedback: string) => Promise<void>; // Make onSubmit async
+  onSubmit: (rating: number, feedback: string) => Promise<void>; 
   isSubmitting: boolean;
 }
 
 function GuestRatingModal({ show, onClose, onSubmit, isSubmitting }: GuestRatingModalProps) {
-  // 2. Initialize router
   const router = useRouter(); 
-  const [rating, setRating] = useState<number>(0); // 0 = not rated
+  const [rating, setRating] = useState<number>(0); 
   const [feedback, setFeedback] = useState<string>("");
 
   const handleStarPress = (index: number) => {
@@ -40,15 +36,12 @@ function GuestRatingModal({ show, onClose, onSubmit, isSubmitting }: GuestRating
       return;
     }
     
-    // Await the parent's submit logic
     await onSubmit(rating, feedback); 
     
-    // Reset state after successful submit
     setRating(0);
     setFeedback("");
     
-    // 3. Add router.replace to navigate
-    router.replace('/GuestReportScreen'); // Navigate to GuestReportScreen
+    router.replace('/GuestReportScreen'); 
   };
 
   return (
@@ -56,18 +49,16 @@ function GuestRatingModal({ show, onClose, onSubmit, isSubmitting }: GuestRating
       visible={show}
       transparent={true}
       animationType="fade"
-      onRequestClose={onClose} // Allow closing modal with back button on Android
+      onRequestClose={onClose} 
     >
       <TouchableOpacity 
         style={styles.modalOverlay} 
         activeOpacity={1} 
-        onPress={onClose} // Close when tapping overlay
+        onPress={onClose} 
       >
-        {/* Prevent taps inside the modal from closing it */}
         <View style={styles.modalContent} onStartShouldSetResponder={() => true}>
           <Text style={styles.modalTitle}>Rate Match Accuracy</Text>
 
-          {/* Star Rating */}
           <View style={styles.starsContainer}>
             {[...Array(5)].map((_, index) => (
               <TouchableOpacity key={index} onPress={() => handleStarPress(index)}>
@@ -80,19 +71,17 @@ function GuestRatingModal({ show, onClose, onSubmit, isSubmitting }: GuestRating
             ))}
           </View>
 
-          {/* Feedback Input */}
           <TextInput
             style={styles.feedbackInput}
             placeholder="Optional: Provide feedback on the matches..."
-            placeholderTextColor={PLACEHOLDER_COLOR} // Apply color
+            placeholderTextColor={PLACEHOLDER_COLOR}
             value={feedback}
             onChangeText={setFeedback}
             multiline
             numberOfLines={4}
-            editable={!isSubmitting} // Disable while submitting
+            editable={!isSubmitting}
           />
 
-          {/* Buttons */}
           <View style={styles.buttonRow}>
             <TouchableOpacity style={styles.closeButton} onPress={onClose} disabled={isSubmitting}>
               <Text style={styles.closeButtonText}>Cancel</Text>
@@ -101,10 +90,10 @@ function GuestRatingModal({ show, onClose, onSubmit, isSubmitting }: GuestRating
               style={[
                 styles.submitButton, 
                 isSubmitting && styles.buttonDisabled,
-                rating === 0 && styles.buttonDisabled // Also disable if no rating
+                rating === 0 && styles.buttonDisabled 
               ]}
               onPress={handleSubmit}
-              disabled={isSubmitting || rating === 0} // Disable if no rating selected
+              disabled={isSubmitting || rating === 0} 
             >
               {isSubmitting ? (
                 <ActivityIndicator color="#fff" size="small" />
@@ -145,12 +134,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: '#333', // Darker text
+    color: '#333', 
   },
   starsContainer: {
     flexDirection: 'row',
     marginBottom: 20,
-    gap: 10, // Add space between stars
+    gap: 10, 
   },
   feedbackInput: {
     width: '100%',
@@ -159,23 +148,23 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     borderRadius: 8,
     padding: 10,
-    textAlignVertical: 'top', // For multiline input
+    textAlignVertical: 'top', 
     marginBottom: 20,
     fontSize: 16,
-    color: '#333', // Text color
+    color: '#333', 
   },
   buttonRow: {
     flexDirection: 'row',
     width: '100%',
-    justifyContent: 'space-between', // Ensure full width spread
+    justifyContent: 'space-between', 
   },
   closeButton: {
-    backgroundColor: '#6c757d', // Gray color
+    backgroundColor: '#6c757d', 
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
-    flex: 1, // Take half width
-    marginRight: 5, // Space between buttons
+    flex: 1, 
+    marginRight: 5, 
   },
   closeButtonText: {
     color: '#fff',
@@ -183,12 +172,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   submitButton: {
-    backgroundColor: '#007AFF', // Blue color
+    backgroundColor: '#007AFF', 
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
-    flex: 1, // Take half width
-    marginLeft: 5, // Space between buttons
+    flex: 1, 
+    marginLeft: 5, 
   },
   submitButtonText: {
     color: '#fff',
@@ -196,7 +185,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   buttonDisabled: {
-    backgroundColor: '#AECBFA', // Lighter blue for disabled
+    backgroundColor: '#AECBFA', 
     opacity: 0.7,
   },
 });

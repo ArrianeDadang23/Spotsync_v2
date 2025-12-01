@@ -12,18 +12,16 @@ import {
   Image,
   SafeAreaView,
 } from 'react-native';
-import { useAuth } from '../context/AuthContext'; // Adjust path if needed
+import { useAuth } from '../context/AuthContext'; 
 import { useRouter } from 'expo-router';
 import { collection, doc, getDocs, setDoc, deleteDoc, getDoc } from 'firebase/firestore';
-import { db } from '../firebase'; // Adjust path if needed
+import { db } from '../firebase'; 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import FoundHeader from '../components/FoundHeader'; // Adjust path if needed
-import BottomNavBar from '../components/BottomNavBar'; // Adjust path if needed
+import FoundHeader from '../components/FoundHeader';
+import BottomNavBar from '../components/BottomNavBar'; 
 
-// 1. IMPORT THE HOOK
-import { useOfflineNotifier } from '../hooks/useOfflineNotifier'; // Adjust path if needed
+import { useOfflineNotifier } from '../hooks/useOfflineNotifier';
 
-// --- Item Card Component (No changes needed) ---
 const ItemCard = ({ item, isSaved, onSaveToggle, onCardPress }) => {
   const reporter = item.personalInfo;
   const isGuest = item.isGuest === true;
@@ -92,7 +90,6 @@ export default function FoundItemsScreen() {
   useEffect(() => {
     if (!currentUser) return;
 
-    // 3. DEFINE FETCHDATA SO IT CAN BE RE-USED
     const fetchData = async () => {
       try {
         setLoading(true);
@@ -112,9 +109,8 @@ export default function FoundItemsScreen() {
       } catch (error) {
         console.error("Error fetching data:", error.code, error.message);
         
-        // 4. IMPLEMENT THE CATCH BLOCK
         if (error.code === 'unavailable' || error.code === 'auth/network-request-failed') {
-          notifyOffline(fetchData); // Pass the fetchData function to be retried
+          notifyOffline(fetchData);
         } else {
           Alert.alert("Error", "Failed to load item data.");
         }
@@ -125,7 +121,7 @@ export default function FoundItemsScreen() {
     };
     
     fetchData();
-  }, [currentUser, notifyOffline]); // 5. ADD NOTIFYOFFLINE TO DEPENDENCY ARRAY
+  }, [currentUser, notifyOffline]); 
 
   const toggleSave = async (item) => {
     if (!currentUser) return;
@@ -227,11 +223,9 @@ export default function FoundItemsScreen() {
                 
                 let formattedDate = 'N/A';
 
-                // 🛑 CORRECTED DATE LOGIC: Handle Firestore Timestamp object
                 if (dateTimestamp && typeof dateTimestamp.seconds === 'number') {
                     formattedDate = new Date(dateTimestamp.seconds * 1000).toLocaleDateString();
                 } else if (item.savedAt && typeof item.savedAt.seconds === 'number') {
-                    // Fallback to saved date if original date is missing
                     formattedDate = new Date(item.savedAt.seconds * 1000).toLocaleDateString();
                 }
 
@@ -253,14 +247,13 @@ export default function FoundItemsScreen() {
                       </Text>
                     </View>
                     
-                    {/* 🛑 LOADING INDICATOR AND EVENT STOPPER */}
                     <TouchableOpacity 
                         style={[styles.unsaveButton, isDeleting && styles.unsaveButtonLoading]}
                         onPress={(e) => { 
                             e.stopPropagation();
                             toggleSave(item);
                         }}
-                        disabled={isDeleting} // Disable while loading
+                        disabled={isDeleting} 
                     >
                         {isDeleting ? (
                             <ActivityIndicator size="small" color="#FFF" />
@@ -278,7 +271,6 @@ export default function FoundItemsScreen() {
         </View>
       </Modal>
       
-             {/* Category Picker Modal */}
       <Modal visible={showCategoryModal} transparent={true} animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
@@ -310,13 +302,11 @@ export default function FoundItemsScreen() {
 
       <BottomNavBar activeScreen="Found" />
       
-      {/* 6. RENDER THE OFFLINE PANEL */}
       <OfflinePanelComponent />
     </SafeAreaView>
   );
 }
 
-// --- STYLES ---
 const styles = StyleSheet.create({
   mainContainer: { flex: 1, backgroundColor: '#f5f9ff' },
   header: {
@@ -395,18 +385,17 @@ const styles = StyleSheet.create({
   reporterName: { fontWeight: 'bold', fontSize: 14 },
   reporterCourse: { fontSize: 12, color: '#888' },
   emptyText: { textAlign: 'center', marginTop: 50, color: '#666', fontSize: 16 },
-// UPDATED MODAL STYLES
   modalOverlay: { 
     flex: 1, 
-    backgroundColor: 'rgba(0,0,0,0.7)', // Darker overlay
+    backgroundColor: 'rgba(0,0,0,0.7)', 
     justifyContent: 'center', 
     alignItems: 'center' 
   }, 
   modalContainer: { 
     backgroundColor: 'white', 
-    borderRadius: 15, // Slightly more rounded
+    borderRadius: 15,
     padding: 15,
-    maxHeight: '80%', // Increased max height
+    maxHeight: '80%', 
     width: '90%', 
     elevation: 10,
     shadowColor: '#000',
@@ -432,7 +421,6 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   
-  // UPDATED SAVED ITEM ROW STYLES
   savedItemRow: { 
     flexDirection: 'row', 
     alignItems: 'center', 
@@ -454,7 +442,7 @@ const styles = StyleSheet.create({
   savedItemName: { 
     fontSize: 16, 
     fontWeight: 'bold',
-    color: '#143447', // Darker text color
+    color: '#143447', 
   },
   savedItemCategory: {
     fontSize: 12,
@@ -467,14 +455,12 @@ const styles = StyleSheet.create({
     marginTop: 1,
   },
   unsaveButton: {
-    backgroundColor: '#FF6347', // Tomato red for unsave action
+    backgroundColor: '#FF6347', 
     borderRadius: 20,
     padding: 8,
     marginLeft: 10,
   },
   unsaveButtonLoading: {
-    // Optionally change color or border while loading
-    opacity: 0.7,
   },
   savedListContent: {
     paddingBottom: 10,

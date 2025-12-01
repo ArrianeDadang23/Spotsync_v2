@@ -19,18 +19,15 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { auth } from "../firebase";
 import { Ionicons } from "@expo/vector-icons";
 
-// 1. IMPORT THE HOOK
-import { useOfflineNotifier } from "../hooks/useOfflineNotifier"; // Adjust path if needed
+import { useOfflineNotifier } from "../hooks/useOfflineNotifier"; 
 
 const PLACEHOLDER_COLOR = "#A9A9A9";
 
 export default function CreateAccountScreen() {
   const router = useRouter();
   const { signup } = useAuth();
-  // ✅ Corrected API URL (just in case)
   const API = "https://server.spotsync.site"; 
 
-  // 2. INSTANTIATE THE HOOK
   const { notifyOffline, OfflinePanelComponent } = useOfflineNotifier();
 
   const [formData, setFormData] = useState({
@@ -57,7 +54,6 @@ export default function CreateAccountScreen() {
     setFormData((prevState) => ({ ...prevState, [name]: value }));
   };
 
-  // --- 👇 [FIX #2 - More Robust Server Handling] ---
   async function sendVerificationEmail(userData, code) {
     try {
       const response = await fetch(`${API}/api/send-email`, {
@@ -74,14 +70,9 @@ export default function CreateAccountScreen() {
         const errorBody = await response.text();
         console.error("API Server Error:", response.status, errorBody);
         
-        // --- UPDATED: Check for *any* 4xx client error ---
-        // This catches 400, 404, 422, etc.
         if (response.status >= 400 && response.status < 500) { 
           throw new Error("Invalid email address provided.");
         }
-        // --- End Update ---
-        
-        // All 5xx server errors will fall through
         throw new Error(`Email server failed. Please try again later. (Status: ${response.status})`);
       }
 
@@ -111,13 +102,10 @@ export default function CreateAccountScreen() {
       }
     }
 
-    // --- 👇 [FIX #1 - Client-Side Email Check] ---
-    // This regex checks for a basic email structure (e.g., user@domain.com)
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       return setError("The email address is not valid.");
     }
-    // --- End Fix ---
 
     try {
       setError("");

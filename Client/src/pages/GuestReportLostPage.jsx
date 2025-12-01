@@ -256,6 +256,22 @@ function GuestReportLostPage() {
       read: false,
     });
   };
+  
+  useEffect(() => {
+    let interval;
+    if (isMatching && progress < 99) {
+      interval = setInterval(() => {
+        setProgress(prev => {
+          const newProgress = prev + Math.random() * 5;
+          return newProgress < 99 ? newProgress : 99;
+        });
+      }, 500);
+    } else if (!isMatching && progress < 100) {
+      setProgress(100); 
+    }
+    
+    return () => clearInterval(interval);
+  }, [isMatching, progress]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -327,6 +343,8 @@ function GuestReportLostPage() {
 
       if (currentUser) {
         setIsMatching(true); 
+        setProgress(0); 
+
         const matchResponse = await fetch(`${API}/api/match/lost-to-found`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -336,6 +354,8 @@ function GuestReportLostPage() {
         if (!matchResponse.ok) throw new Error("Matching failed");
         const matches = await matchResponse.json();
         const top4Matches = matches.slice(0, 4);
+        
+        setProgress(100);
 
         for (let i = 0; i < top4Matches.length; i++) {
           const match = top4Matches[i];
@@ -423,6 +443,7 @@ function GuestReportLostPage() {
     }
     setIsSubmitting(false);
     setIsMatching(false);
+    setProgress(0);
   };
 
   const formStyles = {
@@ -903,7 +924,7 @@ function GuestReportLostPage() {
                 ...((isSubmitting || isMatching || isModerating) ? formStyles.disabledButton : {}),
               }}
               onMouseEnter={(e) => {
-                if (!(isSubmitting || isMatching || isModerating)) e.currentTarget.style.backgroundColor = '#384d5c'; // Darker on hover
+                if (!(isSubmitting || isMatching || isModerating)) e.currentTarget.style.backgroundColor = '#384d5c'; 
               }}
               onMouseLeave={(e) => {
                 if (!(isSubmitting || isMatching || isModerating)) e.currentTarget.style.backgroundColor = '#475C6F'; 

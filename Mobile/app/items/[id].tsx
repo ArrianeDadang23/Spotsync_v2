@@ -11,11 +11,10 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../../firebase'; // Adjust this path if needed
-import { useAuth } from '../../context/AuthContext'; // Adjust this path if needed
-import { MaterialCommunityIcons, Feather } from '@expo/vector-icons'; // ✅ Import Feather for back icon
+import { db } from '../../firebase'; 
+import { useAuth } from '../../context/AuthContext';
+import { MaterialCommunityIcons, Feather } from '@expo/vector-icons'; 
 
-// A helper component to keep the UI clean
 const DetailRow = ({ label, value }) => (
   <View style={styles.detailRow}>
     <Text style={styles.detailLabel}>{label}</Text>
@@ -91,7 +90,6 @@ export default function ItemMoreDetailsScreen() {
 
   return (
     <SafeAreaView style={styles.mainContainer}>
-      {/* ✅ FIX: Added the Back Button */}
       <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
         <Feather name="arrow-left" size={24} color="#333" />
       </TouchableOpacity>
@@ -185,10 +183,9 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     marginTop: -20,
   },
-  // ✅ FIX: Style for the back button
   backButton: {
     position: 'absolute',
-    top: 50, // Adjust this based on your status bar height
+    top: 50, 
     left: 20,
     zIndex: 10,
     backgroundColor: 'rgba(255, 255, 255, 0.8)',

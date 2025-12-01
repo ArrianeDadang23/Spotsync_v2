@@ -11,18 +11,18 @@ import {
   Alert,
   ScrollView,
   Dimensions,
-  // 1. --- Import SafeAreaView and KeyboardAvoidingView ---
+  
   SafeAreaView,
   KeyboardAvoidingView,
 } from "react-native";
-// Firestore imports remain for fetching admin list
+
 import { db } from "../firebase";
 import { getDocs, collection, query, where } from "firebase/firestore";
 
-// CRITICAL FIX: Add import for getAuth
+
 import { getAuth } from "firebase/auth";
 
-// Realtime DB imports for conversation and notifications
+
 import {
   getDatabase,
   ref,
@@ -38,15 +38,15 @@ import {
 import { useAuth } from "../context/AuthContext";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-// Get screen width for responsive centering
+
 const { width: screenWidth } = Dimensions.get("window");
 
-// Initialize Realtime DB
+
 const dbRealtime = getDatabase();
 
 const MAX_OPEN_CONVERSATIONS = 5;
 
-// Define Conversation Message Interface
+
 interface Message {
   id: string;
   from: "user" | "admin";
@@ -55,15 +55,15 @@ interface Message {
   read: boolean;
 }
 
-// Define Conversation Thread Interface (Extended with non-DB property for tracking)
+
 interface Conversation {
   id: string;
   subject: string;
   status: "open" | "resolved";
   lastMessageAt: number;
-  messages: { [key: string]: Message }; // Messages are stored as map, not array
-  unreadCount?: number; // Calculated, not from DB
-  // Other properties from DB: startedAt, user
+  messages: { [key: string]: Message }; 
+  unreadCount?: number; 
+ 
 }
 
 interface MessageAdminButtonProps {
@@ -71,11 +71,11 @@ interface MessageAdminButtonProps {
   onSendError: (message: string) => void;
 }
 
-// --- Conversation View Component ---
+
 function ConversationView({ conversation, onClose, onReply }) {
   const [replyText, setReplyText] = useState("");
   const [sending, setSending] = useState(false);
-  const scrollViewRef = useRef<ScrollView>(null); // Ref for scrolling
+  const scrollViewRef = useRef<ScrollView>(null); 
 
   if (!conversation) return null;
 
@@ -83,7 +83,7 @@ function ConversationView({ conversation, onClose, onReply }) {
     .map(([id, msg]) => ({ id, ...(msg as Omit<Message, 'id'>) } as Message))
     .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
 
-  // Mark admin messages as read
+
   useEffect(() => {
     const auth = getAuth();
     const user = auth.currentUser;
@@ -113,7 +113,7 @@ function ConversationView({ conversation, onClose, onReply }) {
     });
   }, [conversation.id, messages.length]);
 
-  // Scroll to bottom when messages change
+
   useEffect(() => {
     scrollViewRef.current?.scrollToEnd({ animated: true });
   }, [messages.length]);
@@ -126,7 +126,7 @@ function ConversationView({ conversation, onClose, onReply }) {
       await onReply(conversation.id, replyText);
       setReplyText("");
     } catch (error) {
-      // Error handled by parent
+
     } finally {
       setSending(false);
     }
@@ -135,7 +135,7 @@ function ConversationView({ conversation, onClose, onReply }) {
   return (
     <SafeAreaView style={conversationViewStyles.safeArea}>
       <KeyboardAvoidingView
-        style={conversationViewStyles.kavContainer} // Must have flex: 1
+        style={conversationViewStyles.kavContainer} 
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={0} 
       >
@@ -243,13 +243,13 @@ function ConversationView({ conversation, onClose, onReply }) {
     </SafeAreaView>
   );
 }
-// --- End Conversation View Component ---
+
 
 export default function MessageAdminButton({
   onSendSuccess,
   onSendError,
 }: MessageAdminButtonProps) {
-  // ... (All parent component logic, state, useEffect, and handlers remain exactly the same) ...
+  
   const { currentUser } = useAuth();
 
   const userName =
@@ -269,7 +269,7 @@ export default function MessageAdminButton({
   const [selectedConversation, setSelectedConversation] =
     useState<Conversation | null>(null);
 
-  // --- Conversation List and Count Listener ---
+
   useEffect(() => {
     if (!currentUser?.uid) return;
 
@@ -332,7 +332,7 @@ export default function MessageAdminButton({
     return () => unsubscribe();
   }, [currentUser?.uid]); 
 
-  // --- Logic to Start New Conversation ---
+
   const startNewConversation = async () => {
     if (!currentUser || !currentUser.uid) {
       onSendError("User not logged in.");
@@ -660,7 +660,7 @@ export default function MessageAdminButton({
               style={[styles.modalContentCentered, styles.listModalContent]}
               onStartShouldSetResponder={() => true}
             >
-              {/* ... (rest of List View Modal JSX) ... */}
+
               <View style={styles.listHeader}>
                 <Text style={styles.modalTitle}>
                   Your Conversations ({openConversationCount} Open)
@@ -812,7 +812,7 @@ const conversationViewStyles = StyleSheet.create({
         backgroundColor: '#f9f9f9',
         borderBottomWidth: 1,
         borderBottomColor: '#eee',
-        // This view does NOT shrink
+        
     },
     statusLabel: {
         fontSize: 13,
@@ -824,8 +824,8 @@ const conversationViewStyles = StyleSheet.create({
         color: '#666',
     },
     chatArea: {
-        // --- 7. CRITICAL: Add flex: 1 ---
-        flex: 1, // This makes the ScrollView take up all available space
+
+        flex: 1,
         padding: 10,
         backgroundColor: '#e5ddd5', 
     },
@@ -875,14 +875,14 @@ const conversationViewStyles = StyleSheet.create({
         textAlign: 'right',
     },
     footer: {
-        // --- 6. REMOVE manual paddingBottom ---
-        // paddingBottom: Platform.OS === 'ios' ? 20 : 10, // <-- REMOVE
+        
+        
         paddingHorizontal: 5, 
         paddingTop: 5,
         borderTopWidth: 1,
         borderTopColor: '#ccc',
         backgroundColor: '#f0f0f0', 
-        // This view does NOT shrink
+        
     },
     replyText: { 
         textAlign: 'center',
@@ -892,7 +892,7 @@ const conversationViewStyles = StyleSheet.create({
     },
     backButton: {
         position: 'absolute',
-        top: Platform.OS === 'ios' ? 50 : 15, // Adjust for safe area
+        top: Platform.OS === 'ios' ? 50 : 15,
         left: 10,
         zIndex: 100, 
         flexDirection: 'row',
@@ -909,7 +909,7 @@ const conversationViewStyles = StyleSheet.create({
     },
 });
 
-// --- Main FAB and Modal Styles ---
+
 const styles = StyleSheet.create({
   fab: {
     position: "absolute",
@@ -978,9 +978,6 @@ const styles = StyleSheet.create({
     color: '#143447',
     flex: 1, 
     marginRight: 10, 
-    // These styles were moved to listHeader
-    // marginBottom: 15,
-    // paddingBottom: 10,
   },
   label: {
     fontSize: 14,

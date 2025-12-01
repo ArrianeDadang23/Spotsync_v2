@@ -264,7 +264,6 @@ function UserSettingsScreen() {
         firstName, lastName, middleName, email, contactNumber,
         bio, gender, course, section, address,
         
-        // NEW: Include yearLevel in update
         yearLevel,
         
         profileURL: updatedProfileURL,

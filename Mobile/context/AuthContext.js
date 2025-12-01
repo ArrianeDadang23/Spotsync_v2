@@ -5,11 +5,11 @@ import {
   signInWithEmailAndPassword,
   onAuthStateChanged,
   updateProfile,
-  signOut // Imported signOut
+  signOut 
 } from 'firebase/auth';
 import { db } from '../firebase';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { ActivityIndicator, View, StyleSheet } from 'react-native'; // Import native components
+import { ActivityIndicator, View, StyleSheet } from 'react-native'; 
 
 const AuthContext = React.createContext();
 
@@ -55,7 +55,7 @@ export function AuthProvider({ children }) {
         return userCredential;
       })
       .catch(error => {
-        console.error("🔥 Signup error:", error.code, error.message);
+        console.error(" Signup error:", error.code, error.message);
         throw error;
       });
   }
