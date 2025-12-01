@@ -389,56 +389,54 @@ app.get("/server", requireLogin, async (req, res) => {
 });
 
 app.post("/server/create-admin", requireLogin, async (req, res) => {
-  try {
-    const { studentId, email, password } = req.body;
+  try {
+    const { studentId, email, password, firstName, lastName, contactNumber } = req.body;
 
-    if (!studentId || !email || !password) {
-      return res.status(400).send("Student ID, email, and password are required.");
-    }
+    if (!studentId || !email || !password || !firstName || !lastName) {
+      return res.status(400).send("Student ID, email, password, first name, and last name are required.");
+    }
 
-    const userRecord = await auth.createUser({
-      email: email, 
-      studentId: studentId,
-      password: password,
-    });
+    const userRecord = await auth.createUser({
+      email: email,
+      displayName: `${firstName} ${lastName}`,
+      password: password,
+    });
 
-    await db.collection("users").doc(userRecord.uid).set({
-      uid: userRecord.uid,
-      email: userRecord.email,
-      studentId,
-      role: "admin",
-      contactNumber: "",
-      firstName: "",
-      lastName: "",
-      profileURL: "",
-      coverURL: "",
-      designation: "",
-      address: "",
-      yearsOfService: "",
-      middleName: "",
-      gender: "",
-      educationalAttainment: "",
-      bio: "",
-      createdAt: new Date().toISOString(),
-    });
+    await db.collection("users").doc(userRecord.uid).set({
+      uid: userRecord.uid,
+      email: userRecord.email,
+      studentId,
+      role: "admin",
+      contactNumber: contactNumber || "",
+      firstName: firstName,               
+      lastName: lastName,                 
+      profileURL: "",
+      coverURL: "",
+      designation: "",
+      address: "",
+      yearsOfService: "",
+      middleName: "",
+      gender: "",
+      educationalAttainment: "",
+      bio: "",
+      createdAt: new Date().toISOString(),
+    });
 
-    await db.collection("studentIndex").doc(String(studentId)).set({
-      uid: userRecord.uid,
-      email: userRecord.email,
-    });
+    await db.collection("studentIndex").doc(String(studentId)).set({
+      uid: userRecord.uid,
+      email: userRecord.email,
+    });
 
-    return res.render("success", {
+    return res.render("success", {
       title: "Admin Created Successfully",
-      message: `Admin ${studentId} with email ${email} was created.`
-      });
+      message: `Admin ${firstName} ${lastName} (${studentId}) was created.`
+    });
 
-
-  } catch (err) {
-   console.error("Error creating admin:", err);
-    res.status(500).send("Error creating admin: " + err.message);
-  }
+  } catch (err) {
+    console.error("Error creating admin:", err);
+    res.status(500).send("Error creating admin: " + err.message);
+  }
 });
-
 app.post("/server/delete-admin", requireLogin, async (req, res) => {
   try {
     const { userId } = req.body;

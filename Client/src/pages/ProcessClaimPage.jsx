@@ -125,6 +125,14 @@ const styles = {
     marginTop: '10px',
     cursor: 'pointer',
     width: '100%'
+  },
+  manualInputBox: {
+    marginTop: '20px',
+    paddingTop: '20px',
+    borderTop: `1px solid ${theme.border}`,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px'
   }
 };
 
@@ -225,16 +233,20 @@ function ProcessClaimPage() {
   const { matchId } = useParams();
   const matchData = location.state?.match || null;
   const matchDocId = matchId || matchData?.id;
+  
   const [step, setStep] = useState(0); 
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState(null);
   const [claimantPhoto, setClaimantPhoto] = useState(null);
   const [scannedQRData, setScannedQRData] = useState(null);
   const [userData, setUserData] = useState(null);
+  
+  // New State for Manual Input
+  const [manualIdInput, setManualIdInput] = useState("");
+
   const handleQRDetected = useCallback(async (text) => {
     if (step !== 1) return; 
 
-  
     const tokens = text.split(/\s+/);
     const idNumber = tokens.find(t => /^\d+$/.test(t)); 
     
@@ -243,6 +255,11 @@ function ProcessClaimPage() {
       return;
     }
 
+    await performLookup(idNumber, text);
+  }, [step]);
+
+  // Reusable lookup function for both QR and Manual
+  const performLookup = async (idNumber, rawInput = null) => {
     try {
       setLoading(true);
       const q = query(collection(db, "users"), where("studentId", "==", idNumber));
@@ -251,7 +268,7 @@ function ProcessClaimPage() {
       if (!snap.empty) {
         const user = snap.docs[0].data();
         setUserData({ id: snap.docs[0].id, ...user });
-        setScannedQRData({ raw: text, idNumber });
+        setScannedQRData({ raw: rawInput || idNumber, idNumber });
         setAlert({ type: 'success', message: "ID Verified Successfully!" });
         setStep(2); 
       } else {
@@ -263,7 +280,7 @@ function ProcessClaimPage() {
     } finally {
       setLoading(false);
     }
-  }, [step]);
+  };
 
   const { videoRef, devices, activeDeviceId, setActiveDeviceId, takePhoto, streamError } = useCameraScanner(handleQRDetected);
 
@@ -275,11 +292,20 @@ function ProcessClaimPage() {
     }
   };
 
+  const handleManualSubmit = async () => {
+    if (!manualIdInput.trim()) {
+      setAlert({ type: 'warning', message: "Please enter a valid Student ID." });
+      return;
+    }
+    await performLookup(manualIdInput.trim());
+  };
+
   const handleReset = () => {
     setStep(0);
     setClaimantPhoto(null);
     setScannedQRData(null);
     setUserData(null);
+    setManualIdInput("");
   };
 
   const sendNotification = async (uid, msg) => {
@@ -416,7 +442,29 @@ function ProcessClaimPage() {
                   )}
                   
                   {step === 1 && (
-                    <p className="text-muted">Scanning for QR code automatically...</p>
+                    <>
+                      <p className="text-muted small">Scanning for QR code automatically...</p>
+                      
+                      <div style={styles.manualInputBox}>
+                        <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '5px'}}>
+                           <span style={{background: '#fff', padding: '0 10px', color: theme.muted, fontWeight: 'bold'}}>OR</span>
+                        </div>
+                        <input 
+                          type="text" 
+                          className="form-control" 
+                          placeholder="Enter Student ID manually"
+                          value={manualIdInput}
+                          onChange={(e) => setManualIdInput(e.target.value)}
+                        />
+                        <button 
+                          style={{...styles.btnSecondary, marginTop: '5px', backgroundColor: '#e9ecef'}}
+                          onClick={handleManualSubmit}
+                          disabled={loading}
+                        >
+                          {loading ? <Spinner size="sm" animation="border"/> : "Verify ID Manually"}
+                        </button>
+                      </div>
+                    </>
                   )}
                 </div>
               </div>

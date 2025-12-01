@@ -7,7 +7,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { db } from '../firebase';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
-import TableHeader from '../components/TablesHeader';
 
 function ItemClaimedListPage() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -144,18 +143,20 @@ function ItemClaimedListPage() {
       borderRadius: "50%",
       objectFit: "cover",
       cursor: "pointer",
+      border: "2px solid #ddd"
     },
-    profilePlaceholder: {
+    guestPlaceholder: {
       width: "50px",
       height: "50px",
       borderRadius: "50%",
-      backgroundColor: "#007bff",
+      backgroundColor: "#ccc",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
       color: "white",
       fontWeight: "bold",
-      fontSize: "14px",
+      fontSize: "10px",
+      textAlign: "center"
     },
     paginationContainer: {
       textAlign: 'center',
@@ -188,39 +189,27 @@ function ItemClaimedListPage() {
       marginBottom: '20px',
       justifyContent: 'space-between',
     },
-    filterLabel: {
-      marginRight: '10px',
-      fontWeight: 'bold',
-      color: '#555',
-    },
-    personDetails: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '10px',
-    },
     personInfo: {
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'center',
     },
-    guestPlaceholder: {
-      width: "50px",
-      height: "50px",
-      borderRadius: "50%",
-      backgroundColor: "#007bff",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      color: "white",
-      fontWeight: "bold",
-      fontSize: "12px",
+    subText: {
+        fontSize: '0.85rem',
+        color: '#666',
+        margin: 0
+    },
+    mainText: {
+        fontWeight: 'bold',
+        color: '#333',
+        margin: 0
     }
   };
 
   return (
     <>
       <NavigationBar />
-              <BlankHeader />
+      <BlankHeader />
 
       <div style={styles.foundItemBody}>
         <div style={styles.foundItemContainer}>
@@ -244,10 +233,9 @@ function ItemClaimedListPage() {
                     
                 >
                     <Dropdown.Item onClick={() => setSelectedYear("All")}>All</Dropdown.Item>
-                    <Dropdown.Item onClick={() => setSelectedYear("2022")}>2022</Dropdown.Item>
-                    <Dropdown.Item onClick={() => setSelectedYear("2023")}>2023</Dropdown.Item>
                     <Dropdown.Item onClick={() => setSelectedYear("2024")}>2024</Dropdown.Item>
                     <Dropdown.Item onClick={() => setSelectedYear("2025")}>2025</Dropdown.Item>
+                    <Dropdown.Item onClick={() => setSelectedYear("2026")}>2026</Dropdown.Item>
                 </DropdownButton>
             </div>
           </div>
@@ -256,146 +244,87 @@ function ItemClaimedListPage() {
             <table style={styles.table}>
               <thead style={styles.tableHead}>
                 <tr>
-                  <th style={{...styles.tableHeaderCell, ...styles.tableFirstCell}}>Item ID No.</th>
-                  <th style={styles.tableHeaderCell}>Image</th>
-                  <th style={styles.tableHeaderCell}>Owner Actual Face</th>
-                  <th style={styles.tableHeaderCell}>Name</th>
-                  <th style={styles.tableHeaderCell}>Date Claimed</th>
-                  <th style={styles.tableHeaderCell}>Founder</th>
-                  <th style={{...styles.tableHeaderCell, ...styles.tableLastCell}}>Owner</th>
+                  <th style={{...styles.tableHeaderCell, ...styles.tableFirstCell}}>Item ID</th>
+                  <th style={styles.tableHeaderCell}>Item Name</th>
+                  <th style={styles.tableHeaderCell}>Claimant Photo</th>
+                  <th style={styles.tableHeaderCell}>Claimant Details</th>
+                  <th style={styles.tableHeaderCell}>Contact Info</th>
+                  <th style={{...styles.tableHeaderCell, ...styles.tableLastCell}}>Date Claimed</th>
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan="7" style={{ textAlign: "center", padding: "40px", ...styles.tableRow }}>
-                      <img src="/Spin_black.gif" alt="Loading..." style={{ width: "50px" }} />
+                    <td colSpan="6" style={{ textAlign: "center", padding: "40px", ...styles.tableRow }}>
                       <p style={{ marginTop: '10px' }}>Loading Claimed Items...</p>
                     </td>
                   </tr>
                 ) : displayedItems.length > 0 ? (
                   displayedItems.map((item, index) => (
                     <tr style={styles.tableRow} key={index}>
-                      <td style={{...styles.tableDataCell, ...styles.tableFirstCell}}>{item.itemId}</td>
-                      <td style={styles.tableDataCell}>
-                        <div >
-                          {item.images && item.images.length > 0 ? (
-                            <img 
-                              src={item.images[0]} 
-                              alt={item.itemName} 
-                              style={styles.profileImage} 
-                              onMouseEnter={() => setPreviewImage(item.images[0])}
-                              onMouseLeave={() => setPreviewImage(null)}
-                            />
-                          ) : (
-                            <div style={styles.guestPlaceholder}>No Item</div>
-                          )}
-                        </div>
+                      {/* Item ID */}
+                      <td style={{...styles.tableDataCell, ...styles.tableFirstCell}}>
+                        {item.itemId}
                       </td>
+
+                      {/* Item Name */}
+                      <td style={styles.tableDataCell}>
+                        <span style={styles.mainText}>{item.itemName}</span>
+                      </td>
+
+                      {/* Claimant Photo (Base64) */}
                       <td style={styles.tableDataCell}>
                         <div>
-                          {item.ownerActualFace ? (
+                          {item.claimantPhoto ? (
                             <img 
-                              src={item.ownerActualFace} 
-                              alt="Owner Face" 
-                              style={{...styles.profileImage, border: "2px solid #475C6F"}} 
-                              onMouseEnter={() => setPreviewImage(item.ownerActualFace)}
+                              src={item.claimantPhoto} 
+                              alt="Claimant" 
+                              style={styles.profileImage} 
+                              onMouseEnter={() => setPreviewImage(item.claimantPhoto)}
                               onMouseLeave={() => setPreviewImage(null)}
                             />
                           ) : (
-                            <div style={styles.guestPlaceholder}>No Face</div>
+                            <div style={styles.guestPlaceholder}>No Photo</div>
                           )}
                         </div>
                       </td>
-                      <td style={styles.tableDataCell}>{item.itemName}</td>
-                      <td style={styles.tableDataCell}>{new Date(item.dateClaimed).toLocaleString()}</td>
-                      
+
+                      {/* Owner / Claimant Details */}
                       <td style={styles.tableDataCell}>
-                        <div style={styles.personDetails}>
-                          {item.founder?.isGuest ? (
-                            <div style={styles.guestPlaceholder}>Guest</div>
-                          ) : item.founder?.profileURL ? (
-                            <>
-                              <img
-                                src={item.founder.profileURL}
-                                alt="Founder"
-                                style={styles.profileImage}
-                              />
-                              <div style={styles.personInfo}>
-                                <p style={{ fontWeight: "bold", color: "black", margin: 0, fontSize: "13px" }}>
-                                  {`${item.founder?.firstName || ""} ${item.founder?.lastName || ""}`.trim()}
-                                </p>
-                                <p style={{ fontStyle: "italic", color: "black", margin: 0, fontSize: "12px" }}>
-                                  {item.founder?.course?.abbr || "Unknown"}
-                                </p>
-                              </div>
-                            </>
-                          ) : (
-                            <>
-                              <div style={styles.profilePlaceholder}>
-                                {`${item.founder?.firstName?.[0] || ""}${item.founder?.lastName?.[0] || ""}`.toUpperCase()}
-                              </div>
-                              <div style={styles.personInfo}>
-                                <p style={{ fontWeight: "bold", color: "black", margin: 0, fontSize: "13px" }}>
-                                  {`${item.founder?.firstName || ""} ${item.founder?.lastName || ""}`.trim()}
-                                </p>
-                                <p style={{ fontStyle: "italic", color: "black", margin: 0, fontSize: "12px" }}>
-                                  {item.founder?.course?.abbr || "Unknown"}
-                                </p>
-                              </div>
-                            </>
-                          )}
+                        <div style={styles.personInfo}>
+                            <p style={styles.mainText}>
+                                {item.owner?.firstName} {item.owner?.lastName}
+                            </p>
+                            <p style={styles.subText}>
+                                ID: {item.owner?.idNumber || "N/A"}
+                            </p>
                         </div>
                       </td>
                       
-                      <td style={{...styles.tableDataCell, ...styles.tableLastCell}}>
-                        <div style={styles.personDetails}>
-                          {item.isGuest ? (
-                            <div style={styles.guestPlaceholder}>Guest</div>
-                          ) : item.owner?.profileURL ? (
-                            <>
-                              <img
-                                src={item.owner.profileURL}
-                                alt="Owner"
-                                style={styles.profileImage}
-                              />
-                              <div style={styles.personInfo}>
-                                <p style={{ fontWeight: "bold", color: "black", margin: 0, fontSize: "13px" }}>
-                                  {`${item.owner?.firstName || ""} ${item.owner?.lastName || ""}`.trim()}
-                                </p>
-                                <p style={{ fontStyle: "italic", color: "black", margin: 0, fontSize: "12px" }}>
-                                  {item.owner?.course?.abbr || "Unknown"}
-                                </p>
-                              </div>
-                            </>
-                          ) : (
-                            <>
-                              <div style={styles.profilePlaceholder}>
-                                {`${item.owner?.firstName?.[0] || ""}${item.owner?.lastName?.[0] || ""}`.toUpperCase()}
-                              </div>
-                              <div style={styles.personInfo}>
-                                <p style={{ fontWeight: "bold", color: "black", margin: 0, fontSize: "13px" }}>
-                                  {`${item.owner?.firstName || ""} ${item.owner?.lastName || ""}`.trim()}
-                                </p>
-                                <p style={{ fontStyle: "italic", color: "black", margin: 0, fontSize: "12px" }}>
-                                  {item.owner?.course?.abbr || "Unknown"}
-                                </p>
-                              </div>
-                            </>
-                          )}
+                      {/* Contact Info */}
+                      <td style={styles.tableDataCell}>
+                        <div style={styles.personInfo}>
+                            <p style={styles.subText}>{item.owner?.email}</p>
+                            <p style={styles.subText}>{item.owner?.contactNumber}</p>
+                            <p style={{...styles.subText, fontSize: '0.75rem', fontStyle:'italic'}}>{item.owner?.address}</p>
                         </div>
+                      </td>
+                      
+                      {/* Date Claimed */}
+                      <td style={{...styles.tableDataCell, ...styles.tableLastCell}}>
+                        {item.dateClaimed ? new Date(item.dateClaimed).toLocaleString() : "N/A"}
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7" style={{ textAlign: 'center', padding: '20px' }}>No claimed items found.</td>
+                    <td colSpan="6" style={{ textAlign: 'center', padding: '20px' }}>No claimed items found.</td>
                   </tr>
                 )}
               </tbody>
               <tfoot>
                 <tr>
-                  <td colSpan="7" style={styles.paginationContainer}>
+                  <td colSpan="6" style={styles.paginationContainer}>
                     <button 
                       onClick={() => handlePageChange(currentPage - 1)} 
                       disabled={currentPage === 1}
