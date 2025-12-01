@@ -199,15 +199,15 @@ const styles = {
         padding: '0 10px',
         justifyContent: 'flex-start',
     },
-    actionButton: (isLost) => ({ 
+    actionButton: (isLost, disabled) => ({ // Updated to accept disabled state
         padding: '15px 30px',
-        backgroundColor: isLost ? '#dc3545' : '#28a745', 
+        backgroundColor: disabled ? '#ccc' : (isLost ? '#dc3545' : '#28a745'), // Change color if disabled
         color: 'white',
         border: 'none',
         borderRadius: '10px',
         fontWeight: '600',
         fontSize: '1.1rem',
-        cursor: 'pointer',
+        cursor: disabled ? 'not-allowed' : 'pointer', // Change cursor if disabled
         display: 'flex',
         alignItems: 'center',
         gap: '10px',
@@ -216,9 +216,19 @@ const styles = {
         minWidth: '250px',
         justifyContent: 'center',
     }),
-    actionButtonHover: (isLost) => ({
-        backgroundColor: isLost ? '#c82333' : '#218838',
+    actionButtonHover: (isLost, disabled) => ({ // Updated to accept disabled state
+        backgroundColor: disabled ? '#ccc' : (isLost ? '#c82333' : '#218838'), // Hover state for enabled buttons
     }),
+    // Added a specific style for the tooltip/warning text
+    profileWarningText: {
+      color: '#dc3545', 
+      fontSize: '13px', 
+      fontWeight: '600', 
+      maxWidth: '250px', 
+      textAlign: 'left', 
+      lineHeight: '1.2',
+      marginLeft: '10px' 
+    }
 };
 
 const ItemCard = ({ item, type, navigate, user }) => {
@@ -299,6 +309,15 @@ function HomePage() {
   const [loadingLost, setLoadingLost] = useState(true);
   const [loadingFound, setLoadingFound] = useState(true);
 
+  const requiredFields = ["firstName", "lastName", "email", "contactNumber", "address", "course", "gender", "section"];
+  const hasEmptyFields = userData
+    ? requiredFields.some((field) => {
+        const value = userData[field];
+        // Check for undefined, null, or empty string (including if it's an object/array field like 'course' that hasn't been properly set, though a simple string check is used here for brevity based on the original logic)
+        return value === undefined || value === null || (typeof value === 'string' && value.trim() === "") || (typeof value === 'object' && Object.keys(value).length === 0);
+      })
+    : true; // Default to true if userData is null/not yet loaded
+
 
   const handleNavigate = (path) => {
     navigate(path);
@@ -316,6 +335,7 @@ useEffect(() => {
         const data = userDocSnap.data();
         setUserData(data);
 
+        // This part seems to be for legacy or specific need. Keeping it as is.
         Object.entries(data).forEach(([key, value]) => {
           if (value !== undefined && value !== null) localStorage.setItem(key, value);
         });
@@ -394,9 +414,7 @@ useEffect(() => {
   };
 }, []); 
 
-  const hasEmptyFields = userData
-    ? Object.values(userData).some((value) => value === "")
-    : false;
+// Removed the original hasEmptyFields check here as it's now defined above with more rigor
 
   useEffect(() => {
     if (hasEmptyFields) {
@@ -473,13 +491,25 @@ useEffect(() => {
                     </div>
                 )}
             </div>
-
-            <div style={styles.actionWrapper}>
+            
+            <div style={{ ...styles.actionWrapper, flexDirection: 'column' }}> {/* Changed to column to stack buttons and warning */}
+              
+              <div style={{ display: 'flex', gap: '20px', marginBottom: hasEmptyFields ? '10px' : '0' }}>
                 <button 
-                    style={styles.actionButton(true)} 
-                    onClick={() => handleNavigate(`/users/lost-items/${user?.uid}`)}
-                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = styles.actionButtonHover(true).backgroundColor}
-                    onMouseOut={(e) => e.currentTarget.style.backgroundColor = styles.actionButton(true).backgroundColor}
+                    style={styles.actionButton(true, hasEmptyFields)} 
+                    onClick={() => {
+                        if (!hasEmptyFields) {
+                            handleNavigate(`/users/lost-items/${user?.uid}`);
+                        }
+                    }}
+                    onMouseOver={(e) => {
+                        if (!hasEmptyFields) {
+                            e.currentTarget.style.backgroundColor = styles.actionButtonHover(true, false).backgroundColor;
+                        }
+                    }}
+                    onMouseOut={(e) => e.currentTarget.style.backgroundColor = styles.actionButton(true, hasEmptyFields).backgroundColor}
+                    disabled={hasEmptyFields}
+                    title={hasEmptyFields ? "Complete your profile to report a lost item" : "Report Lost Item"}
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-bag-x" viewBox="0 0 16 16">
                         <path fillRule="evenodd" d="M6.146 8.146a.5.5 0 0 1 .708 0L8 9.293l1.146-1.147a.5.5 0 1 1 .708.708L8.707 10l1.147 1.146a.5.5 0 0 1-.708.708L8 10.707l-1.146 1.147a.5.5 0 0 1-.708-.708L7.293 10 6.146 8.854a.5.5 0 0 1 0-.708"/>
@@ -489,10 +519,20 @@ useEffect(() => {
                 </button>
                 
                 <button 
-                    style={styles.actionButton(false)}
-                    onClick={() => handleNavigate(`/users/found-items/${user?.uid}`)}
-                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = styles.actionButtonHover(false).backgroundColor}
-                    onMouseOut={(e) => e.currentTarget.style.backgroundColor = styles.actionButton(false).backgroundColor}
+                    style={styles.actionButton(false, hasEmptyFields)}
+                    onClick={() => {
+                        if (!hasEmptyFields) {
+                            handleNavigate(`/users/found-items/${user?.uid}`);
+                        }
+                    }}
+                    onMouseOver={(e) => {
+                        if (!hasEmptyFields) {
+                            e.currentTarget.style.backgroundColor = styles.actionButtonHover(false, false).backgroundColor;
+                        }
+                    }}
+                    onMouseOut={(e) => e.currentTarget.style.backgroundColor = styles.actionButton(false, hasEmptyFields).backgroundColor}
+                    disabled={hasEmptyFields}
+                    title={hasEmptyFields ? "Complete your profile to report a found item" : "Report Found Item"}
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-bag-check" viewBox="0 0 16 16">
                         <path fillRule="evenodd" d="M10.854 8.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L7.5 10.793l2.646-2.647a.5.5 0 0 1 .708 0"/>
@@ -500,6 +540,14 @@ useEffect(() => {
                     </svg>
                     Report Found Item
                 </button>
+              </div>
+
+              {hasEmptyFields && (
+                <span style={{ ...styles.profileWarningText, marginTop: '5px' }}>
+                    You must complete your profile to report lost or found items.
+                </span>
+              )}
+
             </div>
 
 
