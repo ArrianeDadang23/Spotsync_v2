@@ -1,31 +1,38 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { getAuth, signOut } from "firebase/auth";
-import GuestRatingModal from "../components/GuestRatingModal"
 
-export default function GuestFoundMatchResults(foundItem) {
+export default function GuestFoundMatchResults() {
   const { state } = useLocation();
   const navigate = useNavigate();
+  
+  // Sort matches by overall score descending
   const allMatches = (state?.matches || [])
     .sort((a, b) => (b.scores?.overallScore || 0) - (a.scores?.overallScore || 0));
-  const auth = getAuth();
-  const user = auth.currentUser;
-  const currentUser = auth.currentUser;
+
   const [selectedItem, setSelectedItem] = useState(null);
-  const [showRatingModal, setShowRatingModal] = useState(false);
-  const [copiedMessage, setCopiedMessage] = useState(false); 
+  const [copiedMessage, setCopiedMessage] = useState(false);
   const [showAll, setShowAll] = useState(false);
-  const displayedMatches = showAll ? allMatches : allMatches.slice(0, 4);
+
+  // --- CHANGED LOGIC START ---
+  // 1. Filter for matches 75% or higher
+  const highConfidenceMatches = allMatches.filter(match => (match.scores?.overallScore || 0) >= 75);
+  
+  // 2. Take only the top 4 of those high scoring matches
+  const topMatches = highConfidenceMatches.slice(0, 4);
+
+  // 3. Toggle between showing only top matches or everything
+  const displayedMatches = showAll ? allMatches : topMatches;
+  // --- CHANGED LOGIC END ---
 
   const handleCopy = (text) => {
-    navigator.clipboard.writeText(text).then(() => {
-      setCopiedMessage("Transaction ID Copied!");
-      setTimeout(() => setCopiedMessage(""), 2000);
-    });
+      navigator.clipboard.writeText(text).then(() => {
+        setCopiedMessage("Transaction ID Copied!");
+        setTimeout(() => setCopiedMessage(""), 2000);
+      });
   };
   
   const handleNavigate = () => {
-    setShowRatingModal(true)
+    navigate('/')
   }
 
   const handleMatchAnother = (path) => {
@@ -35,7 +42,7 @@ export default function GuestFoundMatchResults(foundItem) {
   const styles = {
     mainContainer: {
       minHeight: '100vh',
-      backgroundColor: '#f4f4f4',
+      backgroundColor: '#f4f4f4', 
       padding: '20px 0 100px 0',
       fontFamily: 'Arial, sans-serif',
     },
@@ -73,7 +80,7 @@ export default function GuestFoundMatchResults(foundItem) {
     matchCardGrid: {
         display: 'grid',
         gridTemplateColumns: 'repeat(4, 1fr)', 
-        gap: '20px',
+        gap: '20px', 
         '@media (maxWidth: 1024px)': {
             gridTemplateColumns: 'repeat(2, 1fr)',
         },
@@ -102,16 +109,16 @@ export default function GuestFoundMatchResults(foundItem) {
     },
     itemImage: {
         border: '3px solid #475C6F',
-        width: '100px', 
-        height: '100px', 
+        width: '100px',
+        height: '100px',
         objectFit: 'cover',
         borderRadius: '50%',
         marginTop: '10px', 
-        marginBottom: '10px', 
+        marginBottom: '10px',
     },
     itemName: {
         color: '#475C6F',
-        fontSize: '18px', 
+        fontSize: '18px',
         fontWeight: '700',
         marginBottom: '15px', 
         height: '40px', 
@@ -121,10 +128,10 @@ export default function GuestFoundMatchResults(foundItem) {
 
     matchingResults: {
         textAlign: 'left',
-        marginBottom: '20px', 
+        marginBottom: '20px ', 
     },
     progressBarFull: {
-        height: '8px', 
+        height: '8px',
         backgroundColor: '#e0e0e0',
         borderRadius: '5px',
         marginTop: '3px',
@@ -138,7 +145,7 @@ export default function GuestFoundMatchResults(foundItem) {
     }),
     similarityText: {
         color: '#475C6F',
-        fontSize: '12px',
+        fontSize: '12px', 
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -156,8 +163,8 @@ export default function GuestFoundMatchResults(foundItem) {
     },
     transactionID: {
         color: '#777',
-        fontSize: '10px', 
-        marginBottom: '10px', 
+        fontSize: '10px',
+        marginBottom: '10px',
         display: 'flex',
         alignItems: 'center',
     },
@@ -168,9 +175,9 @@ export default function GuestFoundMatchResults(foundItem) {
     },
     profileInfo: {
         backgroundColor: '#e9ecef',
-        borderRadius: '8px',
+        borderRadius: '8px', 
         padding: '8px', 
-        height: '50px',
+        height: '50px', 
         display: 'flex',
         alignItems: 'center',
         marginBottom: '10px',
@@ -181,19 +188,6 @@ export default function GuestFoundMatchResults(foundItem) {
         objectFit: 'cover',
         borderRadius: '50%',
         marginRight: '8px',
-    },
-    profilePlaceholder: {
-      width: "35px",
-      height: "35px",
-      borderRadius: "50%",
-      backgroundColor: "#475C6F", 
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      color: "white",
-      fontWeight: "bold",
-      fontSize: "12px",
-      marginRight: '8px',
     },
     ownerName: {
         fontSize: '14px', 
@@ -206,27 +200,12 @@ export default function GuestFoundMatchResults(foundItem) {
         color: '#6c757d',
         fontStyle: 'italic',
     },
-    descriptionQuote: {
-        color: '#475C6F',
-        width: '18px', 
-        height: '18px',
-        marginBottom: '5px',
-    },
-    howItemDescription: {
-        color: '#475C6F',
-        fontSize: '11px', 
-        height: '40px',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        marginBottom: '15px',
-        lineHeight: '1.4',
-    },
-
+    
     detailsButton: {
         backgroundColor: '#475C6F',
         color: 'white',
         padding: '6px 15px', 
-        borderRadius: '6px',
+        borderRadius: '6px', 
         border: 'none',
         cursor: 'pointer',
         fontWeight: '600',
@@ -306,19 +285,6 @@ export default function GuestFoundMatchResults(foundItem) {
       zIndex: 1001,
       transition: 'opacity 0.3s ease-in-out',
     },
-    seeAllButton: {
-        display: 'block',
-        margin: '20px auto',
-        backgroundColor: 'transparent',
-        color: '#475C6F',
-        border: '2px solid #475C6F',
-        padding: '10px 20px',
-        borderRadius: '8px',
-        cursor: 'pointer',
-        fontWeight: 'bold',
-        fontSize: '16px',
-        transition: 'all 0.3s ease',
-    },
     footerContainer: {
         position: 'fixed',
         bottom: 0,
@@ -354,8 +320,20 @@ export default function GuestFoundMatchResults(foundItem) {
         color: '#475C6F',
         border: '1px solid #475C6F',
     },
+    seeAllButton: {
+        display: 'block',
+        margin: '20px auto',
+        backgroundColor: 'transparent',
+        color: '#475C6F',
+        border: '2px solid #475C6F',
+        padding: '10px 20px',
+        borderRadius: '8px',
+        cursor: 'pointer',
+        fontWeight: 'bold',
+        fontSize: '16px',
+        transition: 'all 0.3s ease',
+    },
   };
-
 
   return (
     <>
@@ -385,7 +363,6 @@ export default function GuestFoundMatchResults(foundItem) {
                   : "N/A"}
               </p>
               <p style={styles.detailItem}><b>Description:</b> {selectedItem.itemDescription || "No detailed description provided"}</p>
-              <p style={styles.detailItem}><b>How Lost:</b> {selectedItem.howItemLost || "N/A"}</p>
             </div>
           </div>
         </div>
@@ -394,13 +371,13 @@ export default function GuestFoundMatchResults(foundItem) {
       <div style={styles.mainContainer}>
        
     <div style={styles.resultsContainer}>
-        <h1 style={styles.heading}>Guest Matching Found Item Results</h1>
+        <h1 style={styles.heading}>Matching Found Item Results</h1>
 
         {allMatches.length === 0 && (
           <div style={styles.noMatchContainer}>
             <p style={styles.noMatchText}>
               No immediate close matches found. <br/> 
-              You can still click **Continue** to proceed or **Match Another** to submit a new report.
+              You can still click Continue to proceed or Match Another to submit a new report.
             </p>
           </div>
         )}
@@ -418,11 +395,6 @@ export default function GuestFoundMatchResults(foundItem) {
             const descriptionScore = formatScore(scores.descriptionScore);
             const locationScore = formatScore(scores.locationScore);
 
-            const isGuest = lostItem.isGuest === true;
-            const posterName = isGuest ? "Guest Owner" : `${posterInfo.firstName || ''} ${posterInfo.lastName || ''}`.trim();
-            const posterCourse = isGuest ? "N/A" : (posterInfo.course && posterInfo.course.abbr || "N/A");
-
-
             return (
               <div key={index} style={styles.matchingCard}>
                 
@@ -435,7 +407,7 @@ export default function GuestFoundMatchResults(foundItem) {
                 {lostItem.images && lostItem.images.length > 0 && (
                   <img
                     src={lostItem.images[0]}
-                    alt="Found Item"
+                    alt="Lost Item"
                     style={styles.itemImage}
                   />
                 )}
@@ -508,25 +480,16 @@ export default function GuestFoundMatchResults(foundItem) {
                     </p>
 
                     <div style={styles.profileInfo}>
-                        {isGuest ? (
-                            <div style={styles.profilePlaceholder}>Guest</div>
-                        ) : (
-                            <img src={posterInfo.profileURL} alt="Poster" style={styles.profileImage}/>
-                        )}
+                        <img src={posterInfo.profileURL} alt="Poster" style={styles.profileImage}/>
                         <div>
                             <p style={styles.ownerName}>
-                              {posterName}
+                              {posterInfo.firstName} {posterInfo.lastName}
                             </p>
                             <p style={styles.ownerCourse}>
-                              {posterCourse}
+                              {posterInfo.course && posterInfo.course.abbr || "N/A"}
                             </p>
                         </div>
                     </div>
-                    
-                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" className="bi bi-quote" viewBox="0 0 16 16" style={styles.descriptionQuote}>
-                      <path d="M12 12a1 1 0 0 0 1-1V8.558a1 1 0 0 0-1-1h-1.388q0-.527.062-1.054.093-.558.31-.992t.559-.683q.34-.279.868-.279V3q-.868 0-1.52.372a3.3 3.3 0 0 0-1.085.992 4.9 4.9 0 0 0-.62 1.458A7.7 7.7 0 0 0 9 7.558V11a1 1 0 0 0 1 1zm-6 0a1 1 0 0 0 1-1V8.558a1 1 0 0 0-1-1H4.612q0-.527.062-1.054.094-.558.31-.992.217-.434.559-.683.34-.279.868-.279V3q-.868 0-1.52.372a3.3 3.3 0 0 0-1.085.992 4.9 4.9 0 0 0-.62 1.458A7.7 7.7 0 0 0 3 7.558V11a1 1 0 0 0 1 1z"/>
-                    </svg>
-                    <p style={styles.howItemDescription}>{lostItem.howItemLost}</p>
                     
                     <div style={{marginTop: '10px'}}>
                       <button 
@@ -546,7 +509,8 @@ export default function GuestFoundMatchResults(foundItem) {
         })}
       </div>
 
-      {allMatches.length > 4 && (
+       {/* --- CHANGED LOGIC: Check against topMatches length --- */}
+       {allMatches.length > topMatches.length && (
         <button 
             style={styles.seeAllButton}
             onClick={() => setShowAll(!showAll)}
@@ -572,11 +536,11 @@ export default function GuestFoundMatchResults(foundItem) {
           onMouseEnter={(e) => e.currentTarget.style.backgroundColor = styles.detailsButtonHover.backgroundColor}
           onMouseLeave={(e) => e.currentTarget.style.backgroundColor = styles.continueButton.backgroundColor}
         >
-          Continue
+          Return to Home
         </button>
         <button 
           style={{...styles.footerButton, ...styles.matchAnotherButton}} 
-          onClick={() => handleMatchAnother(`/guest/found/${user?.uid || "anonymous"}`)}
+          onClick={() => handleMatchAnother('/guest/found-items/procedure')}
           onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#a7cce2'}
           onMouseLeave={(e) => e.currentTarget.style.backgroundColor = styles.matchAnotherButton.backgroundColor}
         >
@@ -590,7 +554,6 @@ export default function GuestFoundMatchResults(foundItem) {
       </div>
 
       </div>
-        {showRatingModal && <GuestRatingModal onClose={() => setShowRatingModal(false)} />}
       {copiedMessage && (
         <div style={styles.copiedMessage}>
           {copiedMessage}

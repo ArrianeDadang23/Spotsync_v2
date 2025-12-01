@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import UserFoundItemsPage from './UserFoundItemsPage';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { getAuth, signOut } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import RatingModal from "../components/RatingModal";
 
 export default function FoundMatchResults() {
@@ -13,11 +12,23 @@ export default function FoundMatchResults() {
 
   const auth = getAuth();
   const user = auth.currentUser; 
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [showRatingModal, setShowRatingModal] = useState(false);
+  const [copiedMessage, setCopiedMessage] = useState(false);
+  const [showAll, setShowAll] = useState(false);
 
-  const [selectedItem, setSelectedItem] = React.useState(null);
-  const [showRatingModal, setShowRatingModal] = React.useState(false);
-    const [showAll, setShowAll] = useState(false);
-  const displayedMatches = showAll ? allMatches : allMatches.slice(0, 4);
+  const highConfidenceMatches = allMatches.filter(match => (match.scores?.overallScore || 0) >= 75);
+  
+  const topMatches = highConfidenceMatches.slice(0, 4);
+
+  const displayedMatches = showAll ? allMatches : topMatches;
+
+  const handleCopy = (text) => {
+      navigator.clipboard.writeText(text).then(() => {
+        setCopiedMessage("Transaction ID Copied!");
+        setTimeout(() => setCopiedMessage(""), 2000);
+      });
+  };
   
   const handleNavigate = () => {
     setShowRatingModal(true)
@@ -26,12 +37,6 @@ export default function FoundMatchResults() {
   const handleMatchAnother = (path) => {
     navigate(path)
   }
-  
-  const handleCopy = (text) => {
-    navigator.clipboard.writeText(text).then(() => {
-      alert(`Transaction ID ${text} copied to clipboard!`); 
-    });
-  };
 
   const styles = {
     mainContainer: {
@@ -73,7 +78,6 @@ export default function FoundMatchResults() {
 
     matchCardGrid: {
         display: 'grid',
-       
         gridTemplateColumns: 'repeat(4, 1fr)', 
         gap: '20px', 
         '@media (maxWidth: 1024px)': {
@@ -96,10 +100,10 @@ export default function FoundMatchResults() {
     rankNumber: {
         position: 'absolute',
         top: '10px',
-        right: '15px',
+        right: '15px', 
         fontSize: '40px', 
         fontWeight: '900',
-        color: '#333', 
+        color: '#475C6F', 
         zIndex: 1,
     },
     itemImage: {
@@ -108,22 +112,22 @@ export default function FoundMatchResults() {
         height: '100px',
         objectFit: 'cover',
         borderRadius: '50%',
-        marginTop: '10px',
-        marginBottom: '10px', 
+        marginTop: '10px', 
+        marginBottom: '10px',
     },
     itemName: {
         color: '#475C6F',
-        fontSize: '18px', 
+        fontSize: '18px',
         fontWeight: '700',
-        marginBottom: '15px',
-        height: '40px',
+        marginBottom: '15px', 
+        height: '40px', 
         overflow: 'hidden',
         textOverflow: 'ellipsis',
     },
 
     matchingResults: {
         textAlign: 'left',
-        marginBottom: '20px', 
+        marginBottom: '20px ', 
     },
     progressBarFull: {
         height: '8px',
@@ -153,13 +157,13 @@ export default function FoundMatchResults() {
 
     resultsMore: {
         textAlign: 'left',
-        paddingTop: '10px', 
+        paddingTop: '10px',
         borderTop: '1px solid #eee',
     },
     transactionID: {
         color: '#777',
-        fontSize: '10px', 
-        marginBottom: '10px', 
+        fontSize: '10px',
+        marginBottom: '10px',
         display: 'flex',
         alignItems: 'center',
     },
@@ -172,13 +176,14 @@ export default function FoundMatchResults() {
         backgroundColor: '#e9ecef',
         borderRadius: '8px', 
         padding: '8px', 
+        height: '50px', 
         display: 'flex',
         alignItems: 'center',
         marginBottom: '10px',
     },
     profileImage: {
-        width: '35px',
-        height: '35px',
+        width: '35px', 
+        height: '35px', 
         objectFit: 'cover',
         borderRadius: '50%',
         marginRight: '8px',
@@ -197,7 +202,7 @@ export default function FoundMatchResults() {
     descriptionQuote: {
         color: '#475C6F',
         width: '18px', 
-        height: '18px', 
+        height: '18px',
         marginBottom: '5px',
     },
     howItemDescription: {
@@ -213,7 +218,7 @@ export default function FoundMatchResults() {
     detailsButton: {
         backgroundColor: '#475C6F',
         color: 'white',
-        padding: '6px 15px',
+        padding: '6px 15px', 
         borderRadius: '6px', 
         border: 'none',
         cursor: 'pointer',
@@ -279,7 +284,20 @@ export default function FoundMatchResults() {
     },
     detailItem: {
         marginBottom: '8px',
-        color: '#333'
+        color: '#333',
+    },
+
+    copiedMessage: {
+      position: 'fixed',
+      bottom: '90px', 
+      right: '20px',
+      background: '#4caf50',
+      color: 'white',
+      padding: '10px 20px',
+      borderRadius: '8px',
+      boxShadow: '0px 2px 8px rgba(0,0,0,0.2)',
+      zIndex: 1001,
+      transition: 'opacity 0.3s ease-in-out',
     },
     footerContainer: {
         position: 'fixed',
@@ -332,7 +350,6 @@ export default function FoundMatchResults() {
     },
   };
 
-
   return (
     <>
         {selectedItem && (
@@ -361,7 +378,6 @@ export default function FoundMatchResults() {
                   : "N/A"}
               </p>
               <p style={styles.detailItem}><b>Description:</b> {selectedItem.itemDescription || "No detailed description provided"}</p>
-              <p style={styles.detailItem}><b>How Lost:</b> {selectedItem.howItemLost || "N/A"}</p>
             </div>
           </div>
         </div>
@@ -372,18 +388,20 @@ export default function FoundMatchResults() {
     <div style={styles.resultsContainer}>
         <h1 style={styles.heading}>Matching Found Item Results</h1>
 
+        {/* Note: This checks 'allMatches'. If matches exist but are below 75%, this won't show. */}
         {allMatches.length === 0 && (
-            <div style={styles.noMatchContainer}>
-                <p style={styles.noMatchText}>
-                    No immediate close matches found. <br/> 
-                    You can still click Continue to proceed or Match Another to submit a new report.
-                </p>
-            </div>
+          <div style={styles.noMatchContainer}>
+            <p style={styles.noMatchText}>
+              No immediate close matches found. <br/> 
+              You can still click Continue to proceed or Match Another to submit a new report.
+            </p>
+          </div>
         )}
 
       <div style={styles.matchCardGrid}>
         {displayedMatches.map((match, index) => {
-            const lostItem = match.lostItem || {};
+            // Note: In FoundMatchResults, we are displaying 'lostItem' details from the match
+            const lostItem = match.lostItem || {}; 
             const posterInfo = lostItem.personalInfo || {};
             const scores = match.scores || {};
             
@@ -491,11 +509,6 @@ export default function FoundMatchResults() {
                         </div>
                     </div>
                     
-                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" className="bi bi-quote" viewBox="0 0 16 16" style={styles.descriptionQuote}>
-                      <path d="M12 12a1 1 0 0 0 1-1V8.558a1 1 0 0 0-1-1h-1.388q0-.527.062-1.054.093-.558.31-.992t.559-.683q.34-.279.868-.279V3q-.868 0-1.52.372a3.3 3.3 0 0 0-1.085.992 4.9 4.9 0 0 0-.62 1.458A7.7 7.7 0 0 0 9 7.558V11a1 1 0 0 0 1 1zm-6 0a1 1 0 0 0 1-1V8.558a1 1 0 0 0-1-1H4.612q0-.527.062-1.054.094-.558.31-.992.217-.434.559-.683.34-.279.868-.279V3q-.868 0-1.52.372a3.3 3.3 0 0 0-1.085.992 4.9 4.9 0 0 0-.62 1.458A7.7 7.7 0 0 0 3 7.558V11a1 1 0 0 0 1 1z"/>
-                    </svg>
-                    <p style={styles.howItemDescription}>{lostItem.howItemLost}</p>
-                    
                     <div style={{marginTop: '10px'}}>
                       <button 
                         onClick={() => setSelectedItem(lostItem)}
@@ -514,7 +527,7 @@ export default function FoundMatchResults() {
         })}
       </div>
 
-      {allMatches.length > 4 && (
+      {allMatches.length > topMatches.length && (
         <button 
             style={styles.seeAllButton}
             onClick={() => setShowAll(!showAll)}
@@ -559,6 +572,12 @@ export default function FoundMatchResults() {
 
       </div>
         {showRatingModal && <RatingModal onClose={() => setShowRatingModal(false)} />}
+      {copiedMessage && (
+        <div style={styles.copiedMessage}>
+          {copiedMessage}
+        </div>
+      )}
+
     </>
   );
 }

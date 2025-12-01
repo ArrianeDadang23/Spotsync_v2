@@ -15,7 +15,7 @@ const INAPPROPRIATE_ALERT_MESSAGE = (flaggedCount) =>
 const MAX_IMAGES = 1;
 
 function GuestReportFoundPage() {
- const API = "https://server.spotsync.site";
+ const API = "http://localhost:4000";
   const { currentUser } = useAuth();
   const navigate = useNavigate();
   const [itemName, setItemName] = useState('');

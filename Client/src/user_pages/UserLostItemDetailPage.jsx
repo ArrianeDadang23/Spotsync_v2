@@ -17,7 +17,7 @@ const MAX_IMAGES = 1;
 
 
 function UserLostItemDetailPage() {
-    const API = "https://server.spotsync.site";
+    const API = "http://localhost:4000";
     const { currentUser } = useAuth();
     const navigate = useNavigate();
     const [itemName, setItemName] = useState('');

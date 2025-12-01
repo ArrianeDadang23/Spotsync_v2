@@ -12,7 +12,7 @@ export default function GuestEmailRequestPage() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const API = "https://server.spotsync.site";
+  const API = "http://localhost:4000";
 
   async function handleSave(e) {
     e.preventDefault();

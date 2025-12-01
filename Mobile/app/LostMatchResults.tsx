@@ -171,33 +171,51 @@ function LostMatchResults() {
   }
 
   const allMatches = itemData.topMatches || [];
-  const displayedMatches = showAll ? allMatches : allMatches.slice(0, 4);
+  
+  // Filter matches that are 75% or above
+  const highConfidenceMatches = allMatches.filter(match => match.scores.overallScore >= 75);
+  
+  // Determine what to display based on state
+  const displayedMatches = showAll ? allMatches : highConfidenceMatches;
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.matchesSection}>
           {allMatches.length > 0 ? (
-            displayedMatches.map((match, index) => (
-              <MatchCard
-                key={match.transactionId || index}
-                match={match}
-                index={index}
-                itemType={itemData.type.toLowerCase()} 
-              />
-            ))
+            <>
+              {/* If there are matches, but none above 75%, and we aren't showing all yet, tell the user */}
+              {!showAll && highConfidenceMatches.length === 0 && (
+                <View style={styles.card}>
+                   <Text style={styles.noMatchesText}>
+                     No high confidence matches (75%+) found. 
+                     Tap "See All Matches" to view lower scores.
+                   </Text>
+                </View>
+              )}
+
+              {displayedMatches.map((match, index) => (
+                <MatchCard
+                  key={match.transactionId || index}
+                  match={match}
+                  index={index}
+                  itemType={itemData.type.toLowerCase()} 
+                />
+              ))}
+            </>
           ) : (
             <View style={styles.card}><Text style={styles.noMatchesText}>No potential matches found by the AI.</Text></View>
           )}
         </View>
 
-        {allMatches.length > 4 && (
+        {/* Only show the button if there are matches hidden (i.e. if total matches > high confidence matches) */}
+        {allMatches.length > highConfidenceMatches.length && (
             <TouchableOpacity 
                 style={styles.seeAllButton} 
                 onPress={() => setShowAll(!showAll)}
             >
                 <Text style={styles.seeAllButtonText}>
-                    {showAll ? "Show Less" : `See All Matches (${allMatches.length})`}
+                    {showAll ? "Show High Matches Only" : `See All Matches (${allMatches.length})`}
                 </Text>
             </TouchableOpacity>
         )}

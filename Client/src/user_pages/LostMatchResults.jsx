@@ -4,20 +4,25 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { getAuth, signOut } from "firebase/auth";
 import RatingModal from "../components/RatingModal";
 
-
 export default function LostMatchResults() {
   const { state } = useLocation();
   const navigate = useNavigate();
   
   const allMatches = (state?.matches || [])
     .sort((a, b) => (b.scores?.overallScore || 0) - (a.scores?.overallScore || 0));
+
   const auth = getAuth();
   const user = auth.currentUser; 
   const [selectedItem, setSelectedItem] = React.useState(null);
   const [showRatingModal, setShowRatingModal] = React.useState(false);
   const [copiedMessage, setCopiedMessage] = React.useState(false);
-    const [showAll, setShowAll] = useState(false);
-  const displayedMatches = showAll ? allMatches : allMatches.slice(0, 4);
+  const [showAll, setShowAll] = useState(false);
+
+  const highConfidenceMatches = allMatches.filter(match => (match.scores?.overallScore || 0) >= 75);
+  
+  const topMatches = highConfidenceMatches.slice(0, 4);
+
+  const displayedMatches = showAll ? allMatches : topMatches;
 
   const handleCopy = (text) => {
       navigator.clipboard.writeText(text).then(() => {
@@ -528,7 +533,7 @@ export default function LostMatchResults() {
         })}
       </div>
 
-      {allMatches.length > 4 && (
+      {allMatches.length > topMatches.length && (
         <button 
             style={styles.seeAllButton}
             onClick={() => setShowAll(!showAll)}

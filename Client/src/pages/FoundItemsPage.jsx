@@ -23,7 +23,7 @@ import BlankHeader from '../components/BlankHeader';
 import { Spinner } from "react-bootstrap"; 
 
 function FoundItemsPage() {
-  const API = "https://server.spotsync.site";
+  const API = "http://localhost:4000";
   
   const [items, setItems] = useState([]); 
   const [currentPage, setCurrentPage] = useState(1);

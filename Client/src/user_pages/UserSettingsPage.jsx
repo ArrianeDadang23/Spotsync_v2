@@ -15,7 +15,7 @@ import createVerificationCode from "../components/createVerificationCode.jsx";
 
 
 function UserSettingsPage() {
-  const API = "https://server.spotsync.site";
+  const API = "http://localhost:4000";
   const { currentUser } = useAuth();
   const [profileImage, setProfileImage] = useState(null);
   const [coverImage, setCoverImage] = useState(null);

@@ -225,17 +225,20 @@ app.post("/api/match/found-to-lost", async (req, res) => {
 
       const scores = await calculateMatchScore(lostItem, foundItem);
 
-      const matchData = {
-        transactionId: generateTransactionId(),
-        itemId: generateItemId(),
-        lostItem: { ...lostItem, id: lostDoc.id },
-        foundItem: { ...foundItem, id: uidFound },
-        scores,
-        createdAt: new Date().toISOString()
-      };
+      if (scores.overallScore >= 55) {
+        const matchData = {
+          transactionId: generateTransactionId(),
+          itemId: generateItemId(),
+          lostItem: { ...lostItem, id: lostDoc.id },
+          foundItem: { ...foundItem, id: uidFound },
+          scores,
+          createdAt: new Date().toISOString()
+        };
+
       await db.collection("matches").add(matchData);
       matches.push(matchData);
     }
+    }
 
     matches.sort((a, b) => b.scores.overallScore - a.scores.overallScore);
     const filteredMatches = matches.filter(m => m.scores.overallScore >= 10);
@@ -265,17 +268,20 @@ app.post("/api/match/lost-to-found", async (req, res) => {
 
       const scores = await calculateMatchScore(lostItem, foundItem);
 
-      const matchData = {
-        transactionId: generateTransactionId(),
-        itemId: generateItemId(),
-        lostItem: { ...lostItem, id: uidLost },
-        foundItem: { ...foundItem, id: foundDoc.id },
-        scores,
-        createdAt: new Date().toISOString()
-      };
+      if (scores.overallScore >= 55) {
+        const matchData = {
+          transactionId: generateTransactionId(),
+          itemId: generateItemId(),
+          lostItem: { ...lostItem, id: uidLost },
+          foundItem: { ...foundItem, id: foundDoc.id },
+          scores,
+          createdAt: new Date().toISOString()
+        };
+
       await db.collection("matches").add(matchData);
       matches.push(matchData);
-    }
+      }
+    }
 
     matches.sort((a, b) => b.scores.overallScore - a.scores.overallScore);
     const filteredMatches = matches.filter(m => m.scores.overallScore >= 10);
