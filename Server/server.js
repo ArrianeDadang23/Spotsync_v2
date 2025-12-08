@@ -350,7 +350,7 @@ function requireLogin(req, res, next) {
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
 
-  if (username === "admin" && password === "admin123") {
+  if (username === "admin" && password === "raven@2003") {
     req.session.isAdmin = true;
     return res.redirect("/server");
   }
